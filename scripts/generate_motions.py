@@ -105,8 +105,9 @@ def classic_piercing_motions(combos):
         for f in (0,PIERCING_MAX_FRAME):
             blade.append(Key(bone,f))
     player=[Key('classic_root',f) for f in range(PIERCING_MAX_FRAME+1)]
-    return (Motion('Classic Stinger Piercing',blade),
-            Motion('Classic Piercing passthrough',player),recovery)
+    # VMD model-name field is 20 bytes (CP932). Keep these deliberately short.
+    return (Motion('Classic Stinger',blade),
+            Motion('Classic Piercing',player),recovery)
 
 def generate(output):
     legacy=json.loads((ROOT/'data/legacy_motion_map.json').read_text())
