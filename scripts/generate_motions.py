@@ -12,6 +12,8 @@ from tools.vmd.transforms import slerp
 ROOT=Path(__file__).resolve().parents[1]
 VMD_FPS=30
 GAME_TPS=20
+VANILLA_SWING_FRAMES=9
+DIRECT_NONE_MOVES={'SlashDim','Iai','SIai'}
 
 def mix(a,b,t):
     return tuple(x+(y-x)*t for x,y in zip(a[0],b[0])),slerp(a[1],b[1],t)
@@ -31,9 +33,9 @@ def last_legacy_move(slot):
 def resolve_recovery(slot,combos):
     """Resolve the first recovery frame, optionally from the pinned r32 reset clock.
 
-    Embedded multi-move slots (currently A4 EX) use the final legacy move as the
-    recovery clock origin. This keeps the visible old move alive for its real
-    comboResetTicks instead of letting a much longer modern END state hold it.
+    Embedded multi-move slots use their final legacy move as the recovery clock
+    origin. The resolved reset is clamped to the modern atlas window because a
+    resource pack cannot keep controlling a state after Resharped leaves it.
     """
     if slot.get('recovery_mode')!='legacy_reset':
         return slot['recovery_start']
@@ -43,6 +45,19 @@ def resolve_recovery(slot,combos):
     if declared is not None and declared!=resolved:
         raise ValueError(f"{slot['name']} recovery_start={declared}, expected legacy reset {resolved}")
     return resolved
+
+def timeout_target(slot,combos):
+    """Return the r32 visual state entered after the final mapped move times out.
+
+    In ItemSlashBlade.onUpdate, saya moves and SlashDim/Iai/SIai reset straight
+    to None. Other non-saya moves enter Noutou and restart the vanilla swing.
+    The mapped moves used by this pack do not rely on a scabbard mainHandCombo.
+    """
+    name,_=last_legacy_move(slot)
+    combo=combos[name]
+    if combo['scabbard'] or name in DIRECT_NONE_MOVES:
+        return 'none'
+    return 'noutou'
 
 def passthrough_pmd():
     # Bone-only PMD, no borrowed mesh. Unknown body-part names cause the existing
@@ -64,6 +79,8 @@ def generate(output):
     for slot in slots:
         start,end=slot['start'],slot['end'];recovery=resolve_recovery(slot,combos)
         name=slot['legacy'];combo=combos[name]
+        source_timeout=slot.get('recovery_mode')=='legacy_reset'
+        target=timeout_target(slot,combos) if source_timeout else None
         # The six-tick ordinary legacy swing is nine VMD frames at 30 Hz.
         # Long modern windows keep a hold; they do not stretch the slash.
         for f in range(start,end+1):
@@ -73,31 +90,46 @@ def generate(output):
                     segments=[s for s in slot.get('segments',[]) if f>=s['start']]
                     if segments:
                         segment=segments[-1];active=combos[segment['legacy']]
-                        t=(f-segment['start'])/segment.get('frames',9)
+                        t=(f-segment['start'])/segment.get('frames',VANILLA_SWING_FRAMES)
                     elif 'second_legacy' in slot and f>=slot['second_start']:
-                        active=combos[slot['second_legacy']];t=(f-slot['second_start'])/9
-                    else:active=combo;t=max(0,elapsed-slot.get('attack_offset',0))/slot.get('swing_frames',9)
+                        active=combos[slot['second_legacy']];t=(f-slot['second_start'])/VANILLA_SWING_FRAMES
+                    else:active=combo;t=max(0,elapsed-slot.get('attack_offset',0))/slot.get('swing_frames',VANILLA_SWING_FRAMES)
                     result=pose(active,min(1,t),sheath)
                 else:
-                    last_name=slot['segments'][-1]['legacy'] if slot.get('segments') else slot.get('second_legacy',name)
-                    active=combos[last_name]
-                    last=pose(active,1,sheath);idle=pose(combos['None'],0,sheath)
-                    span=end-recovery
-                    if combo['scabbard']:
-                        # Reverse the original saya curve into its neutral position.
-                        t=(f-recovery)/max(1,span)
-                        result=mix(last,idle,t)
+                    idle=pose(combos['None'],0,sheath)
+                    if source_timeout:
+                        # Reproduce the old state transition instead of inventing
+                        # a long modern recovery. Saya/Iai-family moves reset to
+                        # None. Other blade moves enter Noutou and start a fresh
+                        # six-tick vanilla swing before becoming neutral.
+                        if target=='none':
+                            result=idle
+                        else:
+                            t=(f-recovery)/VANILLA_SWING_FRAMES
+                            result=pose(combos['Noutou'],min(1,t),sheath) if t<1 else idle
                     else:
-                        # Explicit short transition -> original Noutou -> neutral.
-                        nstart=pose(combos['Noutou'],0,sheath)
-                        elapsed=f-recovery
-                        bridge=min(3,span/4);swing=min(9,span-bridge)
-                        if span==0:result=idle
-                        elif elapsed<bridge:result=mix(last,nstart,elapsed/bridge)
-                        elif elapsed<bridge+swing:result=pose(combos['Noutou'],(elapsed-bridge)/swing,sheath)
-                        else:result=idle
+                        last_name=slot['segments'][-1]['legacy'] if slot.get('segments') else slot.get('second_legacy',name)
+                        active=combos[last_name]
+                        last=pose(active,1,sheath)
+                        span=end-recovery
+                        if combo['scabbard']:
+                            # Legacy candidate behavior retained for slots whose
+                            # timeout has not yet been source-verified.
+                            t=(f-recovery)/max(1,span)
+                            result=mix(last,idle,t)
+                        else:
+                            # Legacy candidate behavior retained for unverified
+                            # slots: short bridge -> Noutou -> neutral.
+                            nstart=pose(combos['Noutou'],0,sheath)
+                            elapsed=f-recovery
+                            bridge=min(3,span/4);swing=min(VANILLA_SWING_FRAMES,span-bridge)
+                            if span==0:result=idle
+                            elif elapsed<bridge:result=mix(last,nstart,elapsed/bridge)
+                            elif elapsed<bridge+swing:result=pose(combos['Noutou'],(elapsed-bridge)/swing,sheath)
+                            else:result=idle
                 keys[(bone,f)]=Key(bone,f,*result)
-        report.append(dict(slot=slot['name'],legacy=name,frames=[start,end],recovery=recovery,status=slot['status']))
+        report.append(dict(slot=slot['name'],legacy=name,frames=[start,end],recovery=recovery,
+                           timeout_target=target,status=slot['status']))
     # Fill genuinely unused gaps with neutral pose. Never interpolate across slots.
     max_frame=max(r['end'] for r in modern if r['resource']=='slashblade:combostate/motion.vmd')
     for f in range(max_frame+1):
