@@ -32,7 +32,8 @@ Record exact Resharped JAR version/hash, Forge version, dependency versions, pac
 For every move:
 
 - [ ] Third-person front, back and side: body, blade and sheath alignment.
-- [ ] First-person view: no invisible/misplaced blade, camera intrusion or broken arms.
+- [ ] First-person attack motion remains visible; no invisible/misplaced blade, catastrophic clipping or camera intrusion.
+- [ ] Do **not** fail phase one solely because the idle/hold camera-relative placement differs from r32. The pinned Resharped renderer hard-codes that outer transform after resetting the incoming pose; exact r32 first-person hold placement is `IMPOSSIBLE_RESOURCE_PACK_ONLY` and is documented in `docs/research/first-person-rendering.md`.
 - [ ] Blade does not unexpectedly cross the body; saya follows intended scabbard strikes.
 - [ ] Start/end poses have no unwanted teleport, snap or unintended intermediate frame.
 - [ ] Slow, normal and earliest possible combo inputs; record discontinuities rather than hiding them.
@@ -42,6 +43,22 @@ For every move:
 - [ ] Existing server gameplay, projectile timing and damage remain unchanged.
 - [ ] Test enable-after-start and restart behavior; record the cache limitation.
 - [ ] Capture modern control / candidate / r32 clips at the same playback speed.
+
+## First-person pass
+
+The first-person runtime check has two different goals and must not mix them:
+
+- **Shared motion acceptance:** verify the classic VMD-driven blade/saya motion reads correctly from the camera during A1–A5, air moves, Rapid/Rising, Judgement, Void and sheath recovery. This is part of the phase-one candidate.
+- **Renderer-wrapper comparison:** record the visual difference between r32's `FPVOldStryleLike` camera-relative hold and Resharped's hard-coded wrapper. This is evidence for the documented ceiling, not a tuning request for `models/item/slashblade.json`.
+
+Specific checks:
+
+- [ ] At idle, document the modern-vs-r32 hold-position difference without treating it as a pack regression.
+- [ ] During A1/A2 saya strikes, both blade and sheath remain visible enough to read the scabbard motion.
+- [ ] During draw/sheath moves, the weapon does not pass through the camera plane or vanish for an extended interval.
+- [ ] Test looking sharply up/down. Resharped uses its own pitch handling; note any uncomfortable camera-relative drift separately from VMD motion errors.
+- [ ] Test Projectile Barrier. Do not expect r32's special first-person branch: that branch is Java-only and `IMPOSSIBLE_RESOURCE_PACK_ONLY` in phase one.
+- [ ] Do not introduce a global model/PMD/VMD offset merely to improve FPV if it worsens third-person weapon placement.
 
 ## Classic trail / effect pass
 
@@ -66,4 +83,4 @@ For Judgement Cut:
 - [ ] Model/texture appearance remains unchanged from the installed Resharped baseline (the files are already r32-identical).
 - [ ] Any difference from r32 is attributed to modern seed/echo/wave/wind Java choreography unless evidence shows an asset issue.
 
-Release gate: observed visual differences, frame/effect-alignment evidence and review of the passthrough-player/resource-only compromises are required before calling A1 PoC or A1–A5 runtime-complete. Static VMD/ZIP validation alone cannot check these boxes.
+Release gate: observed visual differences, frame/effect-alignment evidence and review of the passthrough-player/fixed-first-person-wrapper/resource-only compromises are required before calling A1 PoC or A1–A5 runtime-complete. Static VMD/ZIP validation alone cannot check these boxes.
