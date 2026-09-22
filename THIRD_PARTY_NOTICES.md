@@ -16,7 +16,7 @@ The pinned branch's [src/main/resources/readme.txt](https://github.com/flammpfei
 
 This is a broad permission to use/adapt at one's own responsibility, with no liability assumed by the author. We rely on that project-distributed condition for the procedural adaptation, retain attribution, and do **not** substitute MIT for it. The readme's version heading is stale (1.8.9); the build configuration, branch and official file identify 1.12.2/r32. The source has no blanket MIT license for its art.
 
-The generated `slash.obj`/`slash.png` classic trail adapter is new clean-room project art informed by the narrow/tapered visual language of r32's trail, not a copy or conversion of the old `trail.obj`/`trail.png`. The generated `ss.png` is likewise original. No legacy texture, model or VMD binary is shipped. The official JAR was identified but its binary could not be downloaded in the original research environment, so JAR-to-source bytecode equivalence is not asserted.
+The pack does **not** ship r32's old `trail.obj`/`trail.png`. Runtime testing showed that a resource-only simulated classic ribbon remained out of sync with Resharped's Java-owned `EntitySlashEffect` rotation, so the default pack now suppresses the normal slash-light visual instead. The generated `slash.obj`/`slash.png` are original suppression assets: a microscopic valid quad and fully transparent texture. The generated `ss.png` is likewise original. No legacy texture, model or VMD binary is shipped. The official JAR was identified but its binary could not be downloaded in the original research environment, so JAR-to-source bytecode equivalence is not asserted.
 
 ## Modern contract reference — no art redistribution
 
@@ -42,4 +42,4 @@ Old Dream Reforged is **not** the canonical motion source for this pack and is n
 
 ## Our license boundary
 
-The existing root MIT license applies to original tooling, tests, documentation, metadata, geometric icon, generated clean-room classic trail mesh/texture and generated neutral Drive texture. It does not change the terms of upstream references or the legacy-derived procedural motion/Drive geometry noted above. No upstream asset is claimed as our original art. This notice is included in the runtime ZIP.
+The existing root MIT license applies to original tooling, tests, documentation, metadata, geometric icon, generated slash-suppression mesh/texture and generated neutral Drive texture. It does not change the terms of upstream references or the legacy-derived procedural motion/Drive geometry noted above. No upstream asset is claimed as our original art. This notice is included in the runtime ZIP.

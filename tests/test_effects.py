@@ -8,7 +8,7 @@ import zlib
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
 from scripts.generate_effects import (
-    classic_drive_obj, classic_drive_png, classic_trail_obj, classic_trail_png,
+    classic_drive_obj, classic_drive_png, suppressed_slash_obj, suppressed_slash_png,
     generate, SLASH_OBJ, SLASH_PNG, DRIVE_OBJ, DRIVE_PNG,
 )
 
@@ -44,30 +44,18 @@ def decode_rgba_png(data):
 
 
 class ClassicEffectTests(unittest.TestCase):
-    def test_classic_trail_is_narrow_tapered_ribbon_not_modern_disc(self):
-        vertices,groups,faces=parse_obj(classic_trail_obj())
+    def test_slash_light_override_is_microscopic_not_a_visible_trail(self):
+        vertices,groups,faces=parse_obj(suppressed_slash_obj())
         self.assertEqual(groups,['base'])
-        self.assertEqual(len(faces),28)
+        self.assertEqual(len(vertices),4)
+        self.assertEqual(len(faces),1)
         self.assertTrue(all(len(face)==4 for _,face in faces))
-        radii=[(x*x+z*z)**0.5 for x,_,z in vertices]
-        self.assertGreater(min(radii),45)
-        self.assertLess(max(radii),85)
-        self.assertLess(max(abs(y) for _,y,_ in vertices),1.0)
-        widths=[]
-        for i in range(0,len(vertices),2):
-            a=vertices[i];b=vertices[i+1]
-            widths.append(((a[0]-b[0])**2+(a[2]-b[2])**2)**0.5)
-        self.assertLess(widths[0],4.0)
-        self.assertGreater(max(widths),16.0)
-        self.assertLess(widths[-1],4.0)
+        self.assertLess(max(abs(c) for v in vertices for c in v),0.00001)
 
-    def test_classic_trail_texture_has_bright_core_and_transparent_ends(self):
-        w,h,p=decode_rgba_png(classic_trail_png())
-        self.assertEqual((w,h),(128,32))
-        self.assertEqual(p[h//2][0][3],0)
-        self.assertEqual(p[h//2][-1][3],0)
-        self.assertGreater(p[h//2][w//2][3],200)
-        self.assertLess(p[0][w//2][3],20)
+    def test_slash_light_texture_is_fully_transparent(self):
+        w,h,p=decode_rgba_png(suppressed_slash_png())
+        self.assertEqual((w,h),(1,1))
+        self.assertEqual(p[0][0],(0,0,0,0))
 
     def test_drive_bakes_r32_prism_into_modern_fixed_transform(self):
         vertices,groups,faces=parse_obj(classic_drive_obj())
@@ -87,6 +75,7 @@ class ClassicEffectTests(unittest.TestCase):
         self.assertEqual(set(rows),{'entity_slash_effect','entity_drive','entity_judgement_cut'})
         self.assertEqual(rows['entity_slash_effect']['model'],'slashblade:model/util/slash.obj')
         self.assertIn('Void Slash',rows['entity_slash_effect']['coverage'])
+        self.assertEqual(rows['entity_slash_effect']['pack_action'],'SUPPRESS_SLASH_LIGHT_VISUAL')
         self.assertEqual(rows['entity_drive']['pack_action'],'BAKE_R32_PROCEDURAL_DRIVE_PRISM')
         jc=rows['entity_judgement_cut']
         self.assertEqual(jc['modern_model_git_blob'],jc['legacy_model_git_blob'])
@@ -100,8 +89,6 @@ class ClassicEffectTests(unittest.TestCase):
             self.assertEqual(set(output),{SLASH_OBJ,SLASH_PNG,DRIVE_OBJ,DRIVE_PNG})
             for rel,payload in output.items():
                 self.assertEqual((Path(td)/rel).read_bytes(),payload)
-            # Judgement Cut is deliberately absent: Resharped already ships the
-            # exact r32 slashdim model/texture blobs, so copying art is needless.
             self.assertFalse((Path(td)/'assets/slashblade/model/util/slashdim.obj').exists())
 
 

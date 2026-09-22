@@ -2,7 +2,7 @@
 
 Restore the classic SlashBlade 1.12.2 motion style on SlashBlade: Resharped for Minecraft 1.20.1.
 
-**v0.1.0 experimental candidate — Runtime verification pending.** This is a resource pack, not a mod. It contains a source-derived classic blade/saya animation bake, a vanilla player-pose adapter, dedicated Piercing classicization, and generated classic-style attack-effect adapters. It does **not** contain recovered 1.12.2 skeletal animations: that version implements its blade motions procedurally in Java and has no VMD files.
+**v0.1.0 experimental candidate — Runtime verification pending.** This is a resource pack, not a mod. It contains a source-derived classic blade/saya animation bake, a vanilla player-pose adapter, dedicated Piercing classicization, slash-light suppression, and generated classic Drive visuals. It does **not** contain recovered 1.12.2 skeletal animations: that version implements its blade motions procedurally in Java and has no VMD files.
 
 ## Requirements
 
@@ -31,7 +31,7 @@ The restart is necessary for a reliable test: Resharped caches the player PMD in
 | Void Slash | Dedicated modern **Classic Interpretation**: preparation until the modern tick-16 release, then SlashDim-like attack stage + classic Noutou gesture in Resharped's separate sheath stage |
 | Piercing | Dedicated modern **Classic Interpretation**: Resharped's isolated `piercing.vmd` is replaced by r32 Stinger thrust language with source-timed delayed Noutou recovery; `piercing_pl.vmd` is replaced by the vanilla-body passthrough adapter |
 | B, Circle, C, Sakura, shared Drive/Wave slots | Shared-slot **Classic Interpretation** compromises; one VMD region must serve every modern consumer |
-| Normal slash light / `EntitySlashEffect` | Global generated **Classic Trail Adapter** replaces modern `slash.obj/png` with a narrow tapered afterimage. This covers every `AttackManager.doSlash(...)` effect and Void Slash without per-combo Java changes |
+| Normal slash light / `EntitySlashEffect` | **Suppressed by design.** The default pack overrides `slash.obj/png` with a microscopic valid mesh and fully transparent texture, so neither Resharped's modern slash disc nor the earlier simulated classic ribbon is shown. The effect entity and gameplay logic still run normally |
 | Drive projectile visual | r32's procedural 14-point Drive prism is baked into Resharped's fixed `drive.obj` transform; generated neutral `ss.png` keeps modern blade color tinting |
 | Judgement Cut visual | Resharped already ships the exact r32 `slashdim.obj/png` Git blobs; the pack deliberately leaves them untouched instead of redistributing duplicate art |
 | Player body | Modern custom full-body poses bypassed by a generated PMD adapter; underlying **1.20.1 vanilla poses** retained, not an exact 1.12.2 body restoration |
@@ -46,7 +46,7 @@ The ground classic chain begins with two **saya strikes**. The shared A3 slot th
 
 Piercing has its own independent modern atlas, so it can be classicized without stealing frames from the main chain. Frames 1–32 stay in the r32 neutral blade/saya pose; frame 33 switches to old `Stinger`, matching the modern Java lunge start. Stinger's 20-tick r32 reset clock lands at VMD frame 63, where a fresh `Noutou` recovery begins. The six-tick Noutou swing reaches its final pose at frame 72, that pose is held through 77 because r32 entered Noutou with a delayed `LastActionTime`, and frame 78 returns to neutral. Forward movement, hit timing, just timing and sound remain Resharped behavior.
 
-The project distinguishes **Classic Restoration** from **Classic Interpretation**. Restoration samples a directly corresponding r32 move or procedural visual. Interpretation keeps a modern Resharped move/state but expresses it using r32 motion/effect language. Modern frame sharing is machine-checked so improving one move cannot silently overwrite another move that consumes the same VMD frames. See [modern Classic Interpretation policy](docs/mapping/modern-classic-interpretation.md), [Piercing interpretation](docs/research/piercing-classic-interpretation.md), [classic attack-effect adaptation](docs/mapping/classic-effect-adaptation.md), [source provenance](docs/research/legacy-1.12.2-source.md), [semantic mapping](docs/mapping/legacy-to-resharped.md), [first-person renderer audit](docs/research/first-person-rendering.md), [standby/carry audit](docs/research/standby-carry-rendering.md), and [limitations](docs/limitations.md).
+The project distinguishes **Classic Restoration** from **Classic Interpretation**. Restoration samples a directly corresponding r32 move or procedural visual. Interpretation keeps a modern Resharped move/state but expresses it using r32 motion/effect language. Modern frame sharing is machine-checked so improving one move cannot silently overwrite another move that consumes the same VMD frames. See [modern Classic Interpretation policy](docs/mapping/modern-classic-interpretation.md), [Piercing interpretation](docs/research/piercing-classic-interpretation.md), [attack-effect adaptation](docs/mapping/classic-effect-adaptation.md), [source provenance](docs/research/legacy-1.12.2-source.md), [semantic mapping](docs/mapping/legacy-to-resharped.md), [first-person renderer audit](docs/research/first-person-rendering.md), [standby/carry audit](docs/research/standby-carry-rendering.md), and [limitations](docs/limitations.md).
 
 ### First-person ceiling
 
@@ -54,7 +54,7 @@ The old r32 view is not just an item-model transform. `BladeFirstPersonRender` a
 
 ### Resource-pack effect ceiling
 
-The pack can replace Resharped's hard-coded effect meshes/textures, but it cannot replace the Java entity renderer. For normal slash effects, Resharped still owns spawn timing, lifetime, `rotationOffset - 135° * progress`, scale/flattening, blade color and rank-dependent render passes. Drive and Judgement Cut likewise keep their modern entity timing/choreography. The new effect assets are therefore designed to remain visually coherent under those fixed transforms; they are not a claim that the old blade-attached `LayerSlashBlade` trail renderer is running on 1.20.1.
+The pack can replace Resharped's hard-coded effect meshes/textures, but it cannot replace the Java entity renderer. r32's classic trail was attached to the blade renderer, while Resharped's `EntitySlashEffect` owns a separate progress rotation, lifetime, scale/flattening, color and rank passes. The earlier simulated classic ribbon therefore remained visibly out of sync with the restored weapon motion in runtime testing. The default pack now suppresses that normal slash-light visual entirely rather than pretending to restore a renderer that a resource pack cannot reproduce. Drive and Judgement Cut keep their documented resource-level treatment.
 
 ### Resource-pack audio ceiling
 
@@ -77,8 +77,8 @@ python scripts/build_pack.py
 python scripts/validate_pack.py dist/SlashBlade-Classic-Motion-Pack-1.20.1-v0.1.0.zip
 ```
 
-The build regenerates all shipped VMD/PMD and classic effect resources, writes an original geometric icon, validates the pack and creates a deterministic ZIP with `pack.mcmeta` at its root. `pack/` is only generated staging; a fresh checkout intentionally keeps just its static `pack.mcmeta`, so do not zip that directory before running the build. Players do not run these tools. [Development details](docs/development.md).
+The build regenerates all shipped VMD/PMD and effect resources, writes an original geometric icon, validates the pack and creates a deterministic ZIP with `pack.mcmeta` at its root. `pack/` is only generated staging; a fresh checkout intentionally keeps just its static `pack.mcmeta`, so do not zip that directory before running the build. Players do not run these tools. [Development details](docs/development.md).
 
 ## Credits and license
 
-Classic procedural motion/effect reference: Furia / flammpfeil, SlashBlade `mc1.12-r32`, official `1.12.2` branch. Modern resource contracts: MMF-Group / 0999312, SlashBlade: Resharped. Independent validation reference: Old Dream Reforged, pinned and credited in `THIRD_PARTY_NOTICES.md`. The codec, packaging, generated classic trail art, generated neutral Drive texture and original metadata use this repository's MIT license. The legacy-derived motion and procedural Drive geometry retain their separately documented provenance and custom upstream terms; they are **not** relabeled MIT. No modern upstream VMD, PMD, texture or model binary is redistributed. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+Classic procedural motion/effect reference: Furia / flammpfeil, SlashBlade `mc1.12-r32`, official `1.12.2` branch. Modern resource contracts: MMF-Group / 0999312, SlashBlade: Resharped. Independent validation reference: Old Dream Reforged, pinned and credited in `THIRD_PARTY_NOTICES.md`. The codec, packaging, generated slash-suppression assets, generated neutral Drive texture and original metadata use this repository's MIT license. The legacy-derived motion and procedural Drive geometry retain their separately documented provenance and custom upstream terms; they are **not** relabeled MIT. No modern upstream VMD, PMD, texture or model binary is redistributed. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).

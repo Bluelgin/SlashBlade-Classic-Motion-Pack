@@ -17,9 +17,11 @@
       "model": "slashblade:model/util/slash.obj",
       "texture": "slashblade:model/util/slash.png",
       "coverage": "global AttackManager.doSlash and Void Slash EntitySlashEffect visuals",
-      "policy": "CLASSIC_INTERPRETATION",
-      "pack_action": "GENERATE_CLASSIC_TRAIL_ADAPTER",
-      "java_owned": ["spawn timing", "lifetime", "rotationOffset", "rotationRoll", "baseSize", "rank passes", "color", "progress rotation"]
+      "policy": "VISUAL_SUPPRESSION",
+      "pack_action": "SUPPRESS_SLASH_LIGHT_VISUAL",
+      "reason": "The r32 blade-attached trail renderer cannot be reproduced faithfully through Resharped's rotating EntitySlashEffect resource contract; user testing found the simulated ribbon visually distracting.",
+      "implementation": "microscopic non-degenerate base quad plus fully transparent 1x1 texture",
+      "java_owned": ["spawn timing", "lifetime", "rotationOffset", "rotationRoll", "baseSize", "rank passes", "color", "progress rotation", "gameplay entity behavior"]
     },
     {
       "id": "entity_drive",

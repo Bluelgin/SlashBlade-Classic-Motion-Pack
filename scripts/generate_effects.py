@@ -1,12 +1,11 @@
-"""Generate original classic-style effect assets for Resharped's fixed render contracts.
+"""Generate resource-only visual adapters for Resharped's fixed render contracts.
 
 The player-facing ZIP still contains only resources. This development-time generator
-adapts the visual language of the r32 trail/Drive renderers to the resource paths
-hard-coded by SlashBlade: Resharped.
+suppresses the modern slash-light mesh (the classic trail cannot be reproduced
+faithfully by a resource pack) while retaining the source-derived r32 Drive geometry.
 """
 from __future__ import annotations
 
-import math
 from pathlib import Path
 import struct
 import zlib
@@ -34,27 +33,36 @@ def rgba_png(width: int, height: int, pixel) -> bytes:
             + _chunk(b"IDAT", zlib.compress(b"".join(rows), 9)) + _chunk(b"IEND", b""))
 
 
-def classic_trail_png() -> bytes:
-    """Neutral alpha mask for Resharped's color/rank passes.
+def suppressed_slash_png() -> bytes:
+    """Fully transparent fallback for the hard-coded slash texture path.
 
-    U is travel direction and V is ribbon thickness. The thin bright core plus
-    quickly fading head/tail reproduces the old afterimage language without
-    copying the legacy trail texture.
+    Omitting slash.png would expose Resharped's modern slash light again. Keeping a
+    transparent override makes the visual suppression deterministic while leaving
+    EntitySlashEffect gameplay/timing/network behavior untouched.
     """
-    def pixel(x: int, y: int, w: int, h: int):
-        u = x / (w - 1)
-        v = y / (h - 1)
-        tail = min(1.0, u / 0.18)
-        head = min(1.0, (1.0 - u) / 0.10)
-        longitudinal = (tail * head) ** 0.55
-        edge = max(0.0, 1.0 - abs(v - 0.5) / 0.5)
-        soft = edge ** 0.70
-        core = max(0.0, 1.0 - abs(v - 0.52) / 0.16)
-        alpha = int(255 * longitudinal * min(1.0, 0.68 * soft + 0.52 * core))
-        rgb = int(220 + 35 * core)
-        return rgb, rgb, rgb, alpha
+    return rgba_png(1, 1, lambda *_: (0, 0, 0, 0))
 
-    return rgba_png(128, 32, pixel)
+
+def suppressed_slash_obj() -> str:
+    """Tiny valid base mesh used together with the transparent slash texture.
+
+    The quad is intentionally microscopic but non-degenerate, avoiding parser/normal
+    edge cases while remaining invisible even if a renderer mishandles alpha.
+    """
+    e = 0.000001
+    return (
+        "# Generated invisible slash-light suppression mesh.\n"
+        f"v {-e:.6f} 0.000000 {-e:.6f}\n"
+        f"v { e:.6f} 0.000000 {-e:.6f}\n"
+        f"v { e:.6f} 0.000000 { e:.6f}\n"
+        f"v {-e:.6f} 0.000000 { e:.6f}\n"
+        "vt 0.000000 0.000000\n"
+        "vt 1.000000 0.000000\n"
+        "vt 1.000000 1.000000\n"
+        "vt 0.000000 1.000000\n"
+        "g base\n"
+        "f 1/1 2/2 3/3 4/4\n"
+    )
 
 
 def classic_drive_png() -> bytes:
@@ -67,47 +75,6 @@ def classic_drive_png() -> bytes:
         return 255, 255, 255, alpha
 
     return rgba_png(16, 16, pixel)
-
-
-def classic_trail_obj(segments: int = 28) -> str:
-    """Create a narrow tapered crescent for the global EntitySlashEffect renderer.
-
-    Resharped later flattens Y and scales X/Z to about 3 percent. A much narrower
-    swept ribbon than the modern radial disc stays visually attached to the
-    classic blade path even though Java still owns effect lifetime/rotation.
-    """
-    lines = ["# Generated classic trail adapter; no upstream mesh data copied."]
-    vertices = []
-    uvs = []
-    start = math.radians(-72.0)
-    sweep = math.radians(116.0)
-    for i in range(segments + 1):
-        t = i / segments
-        angle = start + sweep * t
-        envelope = math.sin(math.pi * t) ** 0.58
-        bias = 0.88 + 0.12 * t
-        half_width = 1.4 + 8.8 * envelope * bias
-        center_radius = 66.0 + 5.0 * math.sin(math.pi * t)
-        for side in (-1.0, 1.0):
-            radius = center_radius + side * half_width
-            x = radius * math.cos(angle)
-            z = radius * math.sin(angle)
-            y = 0.30 * envelope
-            vertices.append((x, y, z))
-            uvs.append((t, 0.0 if side < 0 else 1.0))
-
-    for x, y, z in vertices:
-        lines.append(f"v {x:.6f} {y:.6f} {z:.6f}")
-    for u, v in uvs:
-        lines.append(f"vt {u:.6f} {v:.6f}")
-    lines.append("g base")
-    for i in range(segments):
-        a = 2 * i + 1
-        b = a + 1
-        c = a + 3
-        d = a + 2
-        lines.append(f"f {a}/{a} {b}/{b} {c}/{c} {d}/{d}")
-    return "\n".join(lines) + "\n"
 
 
 # r32 RenderDrive procedural prism from the pinned Java source. These source
@@ -153,8 +120,8 @@ def classic_drive_obj() -> str:
 
 def generate(pack: Path) -> dict[str, bytes]:
     assets = {
-        SLASH_OBJ: classic_trail_obj().encode("utf-8"),
-        SLASH_PNG: classic_trail_png(),
+        SLASH_OBJ: suppressed_slash_obj().encode("utf-8"),
+        SLASH_PNG: suppressed_slash_png(),
         DRIVE_OBJ: classic_drive_obj().encode("utf-8"),
         DRIVE_PNG: classic_drive_png(),
     }

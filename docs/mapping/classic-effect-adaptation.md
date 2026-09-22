@@ -1,30 +1,37 @@
-# Classic attack-effect adaptation
+# Attack-effect adaptation
 
 This document defines the resource-pack-only visual policy for attack effects on the pinned SlashBlade: Resharped 1.20.1 target (`6e2a0a092fb794d7ea56fd83452869674f3ab1c7`). It is intentionally separate from the VMD motion mapping.
 
-## Why this exists
+## Why the normal slash light is suppressed
 
-The classic blade/saya bake changes the weapon path substantially. Resharped's modern slash-effect mesh was authored for its modern animation language, so leaving that mesh unchanged can make the effect arc disagree with the classic-looking weapon motion.
+The classic blade/saya bake changes the weapon path substantially. Resharped's modern `EntitySlashEffect` is a separately animated effect entity: Java owns its lifetime, progress rotation, flattening, scale, rank passes and color. r32's classic trail was instead attached to the blade renderer and followed the actual blade motion.
 
-A resource pack cannot replace effect entity logic, but Resharped loads the render meshes/textures through fixed resource locations. We therefore adapt the visual resources while leaving all gameplay/runtime entity behavior authoritative.
+A first resource-only attempt replaced Resharped's radial slash mesh with a narrow classic-style ribbon. Runtime testing showed that the result still looked wrong because the modern effect entity continued its own Java rotation independently of the restored blade motion. That mismatch cannot be solved faithfully with an OBJ/PNG replacement alone.
+
+The default pack therefore makes the deliberate choice to show **no normal slash light at all**. This is preferable to shipping a fake classic trail that visibly disagrees with the restored animation.
 
 ## Effect families
 
 | Runtime family | Resharped resource contract | Pack policy | Coverage |
 |---|---|---|---|
-| `EntitySlashEffect` / `SlashEffectRenderer` | `slashblade:model/util/slash.obj`, `slash.png` | **Classic Interpretation**: generated narrow classic trail adapter | All `AttackManager.doSlash(...)` visuals, including the normal combo families that call it; Void Slash also creates an `EntitySlashEffect` and is covered by the same global override |
+| `EntitySlashEffect` / `SlashEffectRenderer` | `slashblade:model/util/slash.obj`, `slash.png` | **Visual suppression**: microscopic valid mesh + fully transparent texture | All `AttackManager.doSlash(...)` visuals; Void Slash also creates an `EntitySlashEffect` and its slash-light visual is suppressed by the same override |
 | `EntityDrive` / `DriveRenderer` | `slashblade:model/util/drive.obj`, `ss.png` | **Classic Restoration (visual)**: bake the r32 procedural Drive prism into the modern renderer's fixed OBJ coordinate system | Drive-family projectile/wave effect |
 | `EntityJudgementCut` / `JudgementCutRenderer` | `slashblade:model/util/slashdim.obj`, `slashdim.png` | **Already classic upstream**: do not duplicate the art in this pack | Judgement Cut dimension effect |
 
 The machine-readable version of this table is `data/effect_resource_contract.json`.
 
-## Global normal-slash adapter
+## Normal slash-light suppression
 
-Resharped's `SlashEffectRenderer` has exactly one model/texture pair for every `EntitySlashEffect`. There is no per-combo resource selector. That limitation is useful here: replacing `slash.obj` and `slash.png` once covers every normal slash-effect instance produced through `AttackManager.doSlash`, so A/C/B/air/rapid/rising/Sakura and any other combo using that helper receive the same classic visual language automatically.
+Simply deleting `slash.obj/png` from this pack would cause Minecraft to fall back to Resharped's original modern slash light, so the files must remain as overrides.
 
-The generated `slash.obj` is deliberately a narrow tapered crescent rather than Resharped's large radial disc. `slash.png` is a neutral white/alpha mask with a bright center line and fast head/tail falloff. Resharped can still apply the blade color and rank-dependent render passes because the texture does not bake a fixed hue.
+`scripts/generate_effects.py` therefore generates:
 
-The mesh/texture are new deterministic project assets. They are informed by the *visual language* of r32's `trail.obj`/`trail.png`, but they do not copy those legacy binary art resources.
+- a tiny, non-degenerate four-vertex `base` quad for `slash.obj`; and
+- a fully transparent 1x1 RGBA texture for `slash.png`.
+
+The mesh is kept valid and non-degenerate to avoid OBJ parser/normal edge cases. Its microscopic size is a second safety layer in addition to the transparent texture.
+
+This changes only the **rendered slash-light visual**. The `EntitySlashEffect` entity still exists and Resharped remains authoritative for gameplay, timing, networking, sounds and any non-model behavior attached to it.
 
 ## Drive
 
@@ -49,23 +56,23 @@ The following remain Java-owned and cannot be changed by this phase:
 
 - when an effect entity is spawned;
 - effect lifetime and despawn timing;
-- `SlashEffectRenderer`'s progress rotation (`rotationOffset - 135° * progress`), Y flattening, scale curve and rank passes;
+- `SlashEffectRenderer` progress rotation, flattening, scale curve and rank passes;
 - effect color and critical/rank state;
 - Drive entity timing/rotation/alpha curve;
 - Judgement Cut seed rotation, echo/wave/wind choreography;
 - hitboxes, damage, hit timing, particles, sounds and networking.
 
-Therefore the normal slash replacement is **Classic Interpretation**, not a claim that the old blade-attached `LayerSlashBlade` trail renderer has been restored. If a real-game test shows the classic-shaped ribbon visibly continuing its Java rotation after the weapon has already completed the classic VMD swing, that residual mismatch is `IMPOSSIBLE_RESOURCE_PACK_ONLY` under the first-phase rules.
+Because the old blade-attached trail renderer cannot be reconstructed inside Resharped's fixed `EntitySlashEffect` contract, **suppression is the final default policy for normal slash light in the resource-pack-only build**.
 
 ## Build/validation
 
 `python scripts/build_pack.py` generates the effect resources together with the VMD/PMD output. CI verifies:
 
-- the exact hard-coded runtime paths are present in the ZIP;
-- the slash mesh has one `base` ribbon group and a tapered/non-disc geometry;
-- the trail texture has transparent ends and a bright center;
+- the hard-coded `slash.obj/png` paths are present so Resharped cannot fall back to its modern slash light;
+- `slash.png` is a fully transparent 1x1 RGBA texture;
+- `slash.obj` is a microscopic valid `base` quad rather than a visible effect mesh;
 - the Drive mesh reconstructs the documented r32 prism under the modern fixed transform;
-- Judgement Cut remains deliberately unbundled because its installed Resharped model/texture are already byte-identical at the Git-blob level to r32;
+- Judgement Cut remains deliberately unbundled because its installed Resharped model/texture are already byte-identical to r32;
 - no Java/Mixin/script/datapack runtime component is introduced.
 
 Runtime visual acceptance is still a real-game check rather than something CI can certify.
