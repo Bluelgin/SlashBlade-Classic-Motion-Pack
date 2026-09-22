@@ -118,6 +118,20 @@ class TimeoutSemanticsTests(unittest.TestCase):
         for name in noutou:
             self.assertEqual(timeout_target(self.by_name[name], self.combos), 'noutou', name)
 
+    def test_r32_main_hand_combo_scabbard_rule_is_preserved(self):
+        # The r32 default timeout branch also checks mainHandCombo.useScabbard.
+        # Force1/Force2 point at None (whose scabbard flag is true), so they must
+        # reset directly to None if these legacy moves are mapped in the future.
+        def synthetic(name):
+            return {'legacy': name, 'start': 0, 'end': 1, 'recovery_start': 1}
+
+        self.assertEqual(self.combos['Force1']['main_hand_combo'], 'None')
+        self.assertEqual(self.combos['Force2']['main_hand_combo'], 'None')
+        self.assertEqual(self.combos['Force6']['main_hand_combo'], 'Force5')
+        self.assertEqual(timeout_target(synthetic('Force1'), self.combos), 'none')
+        self.assertEqual(timeout_target(synthetic('Force2'), self.combos), 'none')
+        self.assertEqual(timeout_target(synthetic('Force6'), self.combos), 'noutou')
+
     def test_encoded_vmd_enters_the_same_timeout_state_as_r32(self):
         with tempfile.TemporaryDirectory() as tmp:
             output = Path(tmp)
