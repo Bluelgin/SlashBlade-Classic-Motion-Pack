@@ -11,7 +11,7 @@
 - r32's Projectile Barrier first-person branch, pitch-sync policy and first-person blur controls are also Java runtime behavior and are `IMPOSSIBLE_RESOURCE_PACK_ONLY`. A global model/PMD/VMD offset is not accepted as a workaround because it also changes third-person placement. See `docs/research/first-person-rendering.md`.
 - Recovery bridges are adapted; early input, shared windows and air/ground transitions can produce discontinuities. No claim that A1–A5 is already visually seamless.
 - B/C/Circle/Void/Sakura and modern powered A4/A5 are approximations. Broad slot coverage is not equivalent to faithful restoration.
-- Piercing blade data remains upstream. The player PMD adapter changes its body path too.
+- Piercing no longer falls back to upstream animation assets: the pack now generates both dedicated Piercing VMDs. Its blade path is a modern `CLASSIC_INTERPRETATION` using the r32 Stinger full-thrust pose and source-timed Noutou recovery, while its player VMD is a passthrough adapter. Forward lunge, area hit, just timing, sound timing and cancellation remain modern Java and are not restored to r32 behavior.
 - Normal slash-light geometry/texture is now classicized globally through Resharped's fixed `slash.obj/png` resource contract, and Drive gets a baked r32 procedural prism. This does **not** restore r32's blade-attached `LayerSlashBlade` trail renderer: Java still controls effect spawn timing, lifetime, progress rotation, scale/flattening, rank passes and colors. Those differences are `IMPOSSIBLE_RESOURCE_PACK_ONLY` in phase one.
 - Judgement Cut's installed Resharped `slashdim.obj/png` files are already identical to the r32 resource blobs, so the pack leaves them untouched. Its modern Java echo/wave/wind choreography remains authoritative.
 - Other Java-only render-target visibility switches, dynamic blur-copy count and GL-state choreography are not recreated.
@@ -19,11 +19,11 @@
 
 ## Gameplay limitations
 
-Visual animation/effect assets are adapted; gameplay movement still follows SlashBlade: Resharped. The resource pack cannot edit damage, hitboxes, attack ticks, combo branches, velocity, hit stop, cancellation, invulnerability, targeting, input conditions or Java callbacks. A4/A5 Java body rotations remain. Movement portions of Rapid Slash/Rising Star/Aerial Cleave and similar moves are `IMPOSSIBLE_RESOURCE_PACK_ONLY`.
+Visual animation/effect assets are adapted; gameplay movement still follows SlashBlade: Resharped. The resource pack cannot edit damage, hitboxes, attack ticks, combo branches, velocity, hit stop, cancellation, invulnerability, targeting, input conditions or Java callbacks. A4/A5 Java body rotations remain. Movement portions of Rapid Slash/Rising Star/Aerial Cleave/Piercing and similar moves are `IMPOSSIBLE_RESOURCE_PACK_ONLY`.
 
 ## Mapping limitations
 
-Hardcoded frame windows are respected by adapting data. Shared windows cannot represent different animations for different callers. Static player-animation instances and adapter behavior are upstream code. Effect resources are likewise global per renderer: all `EntitySlashEffect` instances share one `slash.obj/png`, so a resource pack cannot choose a different trail mesh per combo. The first-person camera-relative wrapper is another hard-coded renderer transform and is not a VMD slot. No compatibility mod, mixin, datapack or runtime script is supplied.
+Hardcoded frame windows are respected by adapting data. Shared windows cannot represent different animations for different callers. Static player-animation instances and adapter behavior are upstream code. Effect resources are likewise global per renderer: all `EntitySlashEffect` instances share one `slash.obj/png`, so a resource pack cannot choose a different trail mesh per combo. The first-person camera-relative wrapper is another hard-coded renderer transform and is not a VMD slot. Runtime back/offhand `CarryType` placement is also Java-only. No compatibility mod, mixin, datapack or runtime script is supplied.
 
 ## Provenance limitations
 
@@ -34,6 +34,7 @@ The genuine official r32 release and corresponding versioned branch are identifi
 - Compare r32 and target build in the same viewpoints, with ordinary and powered chains.
 - Verify body/weapon alignment, camera safety, multiplayer and resource activation.
 - In first person, verify that the shared classic VMD motion remains visible and usable, with no disappearance, severe clipping or camera intrusion. Do **not** require the r32 static hold matrix itself for phase-one acceptance; that difference is a documented resource-pack ceiling.
+- Verify Piercing's frame-33 Stinger commit, modern forward lunge alignment, frame-63 Noutou recovery and frame-72 neutral return. Confirm the passthrough player body does not make the lunge unreadable.
 - Verify classic trail alignment across A/B/C/air/rapid/rising/Sakura/Void flows and confirm the fixed modern `-135° * progress` rotation does not create unacceptable post-swing drift.
 - Verify the baked classic Drive prism orientation for both horizontal and vertical/wave usages.
 - Tune source-derived timing and recovery within fixed slots.
