@@ -46,7 +46,10 @@ class Motion:
             if not all(math.isfinite(v) for v in (*k.position,*k.rotation)): raise ValueError('Nonfinite pose')
             norm=sum(v*v for v in k.rotation)
             if abs(norm-1)>0.002: raise ValueError(f'Nonunit quaternion {pair}: {norm}')
-            if len(k.interpolation)!=64 or max(k.interpolation)>127: raise ValueError('Invalid interpolation bytes')
+            # Only the first 16 bytes contain canonical control coordinates.
+            # Exporters leave arbitrary bytes in redundant/padding positions.
+            # Preserve all 64 bytes; rejecting padding >127 rejects valid upstream VMDs.
+            if len(k.interpolation)!=64 or max(k.interpolation[:16])>127: raise ValueError('Invalid interpolation coordinates')
         validate_tail(self.tail)
 
     def encode(self):

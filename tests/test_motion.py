@@ -38,6 +38,10 @@ class CodecTests(unittest.TestCase):
         self.assertEqual(decode(m.encode()).tail,morph)
         with self.assertRaises(ValueError):remap(m,0,10,1,41)
         with self.assertRaises(ValueError):decode(m.encode()[:-1])
+    def test_exporter_interpolation_padding_is_preserved(self):
+        raw=bytearray(self.motion.keys[0].interpolation);raw[31]=204;raw[63]=255
+        m=Motion('padding',[dataclasses.replace(self.motion.keys[0],interpolation=bytes(raw))])
+        self.assertEqual(decode(m.encode()).keys[0].interpolation,bytes(raw))
 
 class RetargetTests(unittest.TestCase):
     @classmethod

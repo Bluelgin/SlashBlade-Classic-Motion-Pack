@@ -25,6 +25,10 @@ The bake resets intermediate bones and writes complete transformed poses to hard
 
 NyMmd `MotionData.getMotionPosRot` uses linear translation and quaternion slerp in this version, ignoring VMD Bezier interpolation bytes. The generic tool preserves those bytes; the procedural bake samples every integer frame to approximate the old nonlinear curve. Subframe interpolation remains an approximation.
 
+All six upstream VMD binaries were read for inspection (not shipped): motion.vmd has 1,689 bone records/9 bones; player_motion.vmd has 1,336/23; piercing.vmd 53/9; piercing_pl.vmd 68/8; test.vmd 41/9; test_pl.vmd 15/5. Per-bone ranges and SHA256 are in `data/upstream_vmd_inspection.json`. Piercing assets end at frame 84 while registrations extend to 90. The original Alex PMD has 23 bones, including the seven body-part names consulted by the adapter. No VMC file appears in the inventory.
+
+Real upstream exports contain values greater than 127 in unused/redundant interpolation padding. Validation checks the canonical first 16 control-coordinate bytes and preserves all 64; rejecting arbitrary padding would incorrectly reject both main upstream atlases. This was caught by reading the actual binaries and covered by a regression test.
+
 ## old_motion.vmd
 
 `DefaultResources.BaseMotionLocation` declares `combostate/old_motion.vmd`; the pinned asset tree does not contain it. All 92 registered ComboStates were parsed: 87 resolve explicitly or by Builder default to ExMotionLocation (`motion.vmd`); five Piercing states use `piercing.vmd`. None resolves to BaseMotionLocation. Supplying old_motion.vmd alone cannot affect these built-in combos. This is a retained declaration with no callsite in the audited combo loading route; its historic removal reason has not been established, and no speculative claim is made.
@@ -32,3 +36,5 @@ NyMmd `MotionData.getMotionPosRot` uses linear translation and quaternion slerp 
 ## Playback mismatches that data cannot fix
 
 Blade time follows timeout transitions and clamps inside each state's frame interval; player time starts at its registered start frame and runs the longer interval. `ComboState.getTimeoutMS` divides duration by speed, whereas the inspected layer's frame lookup uses raw elapsed time. Non-unit-speed moves can transition before a complete visual window plays. Shared states and Java callbacks also control body yaw, velocity and effects. These are documented limits, never patched with runtime code.
+
+Modern `ItemSlashBlade.onEntitySwing` allows the vanilla swing only when the blade's last-action time matches game time, unlike the old unconditional false return. The passthrough rig cannot repair differences in when that underlying swing is triggered; remote and timeout-related poses require runtime checking.

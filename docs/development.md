@@ -14,6 +14,8 @@ The extractor resolves Builder defaults and explicit resource constants and fail
 
 Legacy constants are pinned in data/legacy_motion_map.json, from the 34 ComboSequence definitions. Frame plan and approximation labels are in data/bake_slots.json. A build needs no network access or proprietary binary inputs.
 
+To re-extract those constants, run `python scripts/extract_legacy_map.py /path/to/pinned-legacy-source`. It parses numeric expressions without executing Java or arbitrary Python input.
+
 ## VMD tooling
 
 ```sh
