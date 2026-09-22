@@ -1,0 +1,38 @@
+{
+  "target": {
+    "repository": "0999312/SlashBlade_Resharped",
+    "commit": "6e2a0a092fb794d7ea56fd83452869674f3ab1c7",
+    "blade_resource": "slashblade:combostate/piercing.vmd",
+    "player_resource": "slashblade:combostate/piercing_pl.vmd",
+    "modern_windows": [
+      {"id": "slashblade:piercing", "start": 1, "end": 33},
+      {"id": "slashblade:piercing_2", "start": 33, "end": 55},
+      {"id": "slashblade:piercing_just", "start": 34, "end": 55},
+      {"id": "slashblade:piercing_end", "start": 55, "end": 65},
+      {"id": "slashblade:piercing_end2", "start": 65, "end": 90}
+    ]
+  },
+  "adaptation": "CLASSIC_INTERPRETATION",
+  "legacy_reference": {
+    "repository": "flammpfeil/SlashBlade",
+    "commit": "ba1ef8604c0971f68336b882b42a868df7f32f0b",
+    "move": "Stinger",
+    "reset_ticks": 20,
+    "active_frame": 33,
+    "recovery_frame": 63,
+    "recovery_move": "Noutou",
+    "neutral_frame": 72
+  },
+  "player_body": {
+    "strategy": "passthrough",
+    "reason": "r32 has no dedicated skeletal Piercing VMD; modern full-body Piercing is bypassed so the source-derived blade path can ride vanilla body/movement instead"
+  },
+  "runtime_authority": [
+    "forward lunge",
+    "area hit",
+    "sound timing",
+    "input/just timing",
+    "state transitions"
+  ],
+  "notes": "Frames 1..32 keep the classic neutral blade/saya pose. The modern lunge begins at frame 33, where the blade switches to the r32 Stinger full-thrust pose. Stinger's 20-tick reset clock converts to 30 VMD frames, so Noutou recovery starts at frame 63 and reaches neutral at frame 72. This is a visual interpretation, not a claim that modern Piercing existed in r32."
+}
