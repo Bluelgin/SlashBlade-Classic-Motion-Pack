@@ -9,10 +9,12 @@ from tools.vmd.legacy import dynamic as r32_dynamic, progress as r32_progress
 from tools.vmd.old_dream_oracle import (
     ALIASES,
     dynamic as oracle_dynamic,
+    normalized_motion_matrix,
     parameters,
     progress as oracle_progress,
     retarget_pose,
 )
+from tools.vmd.transforms import chain, from_pose, translation as T, scale as S, rotate as R
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -69,10 +71,13 @@ class OldDreamOracleTests(unittest.TestCase):
                             )
 
     def test_generated_vmd_primary_swings_match_oracle(self):
-        # This closes a gap in the first PoC: validate the *encoded binary keys*,
-        # not only the Python transform functions. Compound/multi-segment slots are
-        # tested separately by the normal generator suite; here we compare every
-        # simple primary swing for which Old Dream supplies an independent oracle.
+        # Validate the encoded binary keys and then feed those decoded hardpoint
+        # records through the same transform chain used by Resharped's blade layer.
+        # This catches codec, handedness, quaternion and retargeting errors that a
+        # source-level function-vs-function comparison can miss.
+        #
+        # Compound/multi-segment slots are intentionally excluded because a single
+        # Old Dream move is not their complete semantic reference.
         with tempfile.TemporaryDirectory() as tmp:
             output = Path(tmp)
             generate(output)
@@ -80,6 +85,7 @@ class OldDreamOracleTests(unittest.TestCase):
             keys = {(key.bone, key.frame): key for key in motion.keys}
 
             compared = 0
+            max_matrix_error = 0.0
             for slot in self.slots:
                 name = slot['legacy']
                 if name not in ALIASES or slot.get('segments') or 'second_legacy' in slot:
@@ -97,17 +103,49 @@ class OldDreamOracleTests(unittest.TestCase):
                     t = min(1.0, t)
                     for bone, sheath in (('hardpointA', False), ('hardpointB', True)):
                         key = keys[(bone, frame)]
+
                         expected_pos, expected_rot = retarget_pose(name, t, sheath)
                         for actual, expected in zip(key.position, expected_pos):
-                            self.assertAlmostEqual(actual, expected, places=5,
-                                msg=f'{slot["name"]} {bone} frame={frame} position')
+                            self.assertAlmostEqual(
+                                actual,
+                                expected,
+                                places=5,
+                                msg=f'{slot["name"]} {bone} frame={frame} position',
+                            )
                         # q and -q encode the same rotation, so compare absolute dot.
                         dot = abs(sum(a * b for a, b in zip(key.rotation, expected_rot)))
-                        self.assertGreater(dot, 1.0 - 1e-5,
-                            msg=f'{slot["name"]} {bone} frame={frame} rotation')
+                        self.assertGreater(
+                            dot,
+                            1.0 - 1e-5,
+                            msg=f'{slot["name"]} {bone} frame={frame} rotation',
+                        )
+
+                        reconstructed = chain(
+                            T(0, 1.5, 0),
+                            S(0.125),
+                            R('z', 180),
+                            S(-1, 1, 1),
+                            from_pose(key.position, key.rotation),
+                            S(-1, 1, 1),
+                            S(8),
+                        )
+                        expected_matrix = normalized_motion_matrix(name, t, sheath)
+                        for row in range(4):
+                            for col in range(4):
+                                error = abs(reconstructed[row][col] - expected_matrix[row][col])
+                                max_matrix_error = max(max_matrix_error, error)
+                                self.assertLessEqual(
+                                    error,
+                                    2e-5,
+                                    msg=(
+                                        f'{slot["name"]} {bone} frame={frame} '
+                                        f'matrix[{row},{col}] error={error}'
+                                    ),
+                                )
                         compared += 1
 
             self.assertGreater(compared, 100)
+            self.assertLessEqual(max_matrix_error, 2e-5)
 
 
 if __name__ == '__main__':
