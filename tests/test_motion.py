@@ -63,14 +63,24 @@ class RetargetTests(unittest.TestCase):
         self.assertEqual(pose(a,.5,True),pose(a,.5,False))
         self.assertEqual(pose(a,1),pose(b,0))
         self.assertEqual(pose(b,1),pose(self.combos['None'],0))
-    def test_a3_battou_recovery_starts_at_classic_timeout_boundary(self):
+    def test_ground_draw_branches_follow_classic_semantics(self):
         slots=json.loads((ROOT/'data/bake_slots.json').read_text())['slots']
         a3=next(x for x in slots if x['name']=='A3 / Sakura right')
-        battou=self.combos['Battou']
+        delayed=next(x for x in slots if x['name']=='C / Drive horizontal')
+        # r32 Saya2 has two visual exits: fast/high-rank -> SIai and
+        # late/low-rank -> Battou. Resharped's early A2 path reaches A3 while
+        # the later A2_END input path reaches C, so preserve that topology.
+        self.assertEqual(a3['legacy'],'SIai')
+        self.assertEqual(delayed['legacy'],'Battou')
+
+    def test_a3_quick_draw_recovery_starts_at_classic_timeout_boundary(self):
+        slots=json.loads((ROOT/'data/bake_slots.json').read_text())['slots']
+        a3=next(x for x in slots if x['name']=='A3 / Sakura right')
+        siai=self.combos['SIai']
         # comboResetTicks is a state-reset/timeout window, not the duration of
-        # the visible swing. At 30 VMD frames / 20 game ticks, r32 Battou's
+        # the visible swing. At 30 VMD frames / 20 game ticks, r32 SIai's
         # 12-tick reset lands 18 frames after modern slot start: 200 -> 218.
-        expected=a3['start']+round(battou['reset_ticks']*30/20)
+        expected=a3['start']+round(siai['reset_ticks']*30/20)
         self.assertEqual(expected,218)
         self.assertEqual(a3['recovery_start'],expected)
 
