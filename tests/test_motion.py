@@ -63,6 +63,25 @@ class RetargetTests(unittest.TestCase):
         self.assertEqual(pose(a,.5,True),pose(a,.5,False))
         self.assertEqual(pose(a,1),pose(b,0))
         self.assertEqual(pose(b,1),pose(self.combos['None'],0))
+    def test_a3_battou_recovery_starts_at_classic_timeout_boundary(self):
+        slots=json.loads((ROOT/'data/bake_slots.json').read_text())['slots']
+        a3=next(x for x in slots if x['name']=='A3 / Sakura right')
+        battou=self.combos['Battou']
+        # comboResetTicks is a state-reset/timeout window, not the duration of
+        # the visible swing. At 30 VMD frames / 20 game ticks, r32 Battou's
+        # 12-tick reset lands 18 frames after modern slot start: 200 -> 218.
+        expected=a3['start']+round(battou['reset_ticks']*30/20)
+        self.assertEqual(expected,218)
+        self.assertEqual(a3['recovery_start'],expected)
+
+        modern=json.loads((ROOT/'data/resharped_blade_frame_map.json').read_text())['entries']
+        by_id={x['id']:x for x in modern}
+        # This same frame is a real modern state boundary for both consumers of
+        # this shared atlas region: Combo A3 and Sakura End Right.
+        self.assertEqual(by_id['slashblade:combo_a3']['end'],expected)
+        self.assertEqual(by_id['slashblade:combo_a3_end']['start'],expected)
+        self.assertEqual(by_id['slashblade:sakura_end_right']['end'],expected)
+        self.assertEqual(by_id['slashblade:sakura_end_finish']['start'],expected)
     def test_all_build_frames_and_determinism(self):
         with tempfile.TemporaryDirectory() as t:
             p=Path(t);generate(p)
