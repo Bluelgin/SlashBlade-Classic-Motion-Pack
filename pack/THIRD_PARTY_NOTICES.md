@@ -25,6 +25,17 @@ This is a broad permission to use/adapt at one's own responsibility, with no lia
 - Inspected files: `model/pa/player_motion.vmd` inventory, `combostate/motion.vmd` inventory, `model/bladeholder.pmd` bone hierarchy, player adapter, blade renderer, NyMmd interpolation, default resources and combo registry.
 - Redistribution status: upstream art is **not** included. The pack uses the existing installed bladeholder and game blade models. Its `model/pa/alex.pmd` is a new bone-only format adapter, not a modified copy of upstream Alex. Its player VMD contains newly generated neutral adapter keys, not upstream animation.
 
+## Old Dream Reforged validation reference
+
+- Project: [rianfalltwilight-lab/seac-slashblade-old-dream-reforged](https://github.com/rianfalltwilight-lab/seac-slashblade-old-dream-reforged).
+- Commit used as the validation pin: `a6b8cf5e3b5b3f270212a47b8d373a95f6a31af3`.
+- License: MIT for that project's own code; its third-party visual data retains separate upstream terms.
+- Referenced files: `LegacyMove.java`, `LegacyBladePose.java`, `LegacyCombat.java`, `client/LegacyHeldRenderer.java`, `client/LegacyBodyAnimations.java`, `mixin/LegacyBodyMotionMixin.java`, and `mixin/LegacyBladePoseMixin.java`.
+- Purpose here: independent regression oracle for the classic procedural move table, swing-progress curve and blade/saya transform order.
+- Local validation derivative: `tools/vmd/old_dream_oracle.py`. It is development-only and is not shipped in the runtime resource pack.
+
+Old Dream Reforged is **not** the canonical motion source for this pack and is not a runtime dependency. The official 1.12.2/r32 source remains authoritative when the two references differ. No Old Dream Reforged JAR, model, texture, trail asset or other binary resource is redistributed by this project.
+
 ## Our license boundary
 
 The existing root MIT license applies to original tooling, tests, documentation, metadata and geometric icon. It does not change the terms of upstream references or the legacy-derived motion noted above. No upstream asset is claimed as our original art. This notice is included in the runtime ZIP.
