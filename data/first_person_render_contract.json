@@ -1,0 +1,55 @@
+{
+  "schema": 1,
+  "scope": "Minecraft 1.20.1 + SlashBlade: Resharped 1.9.65 resource-pack-only first-person feasibility",
+  "legacy": {
+    "repository": "flammpfeil/SlashBlade",
+    "commit": "ba1ef8604c0971f68336b882b42a868df7f32f0b",
+    "file": "src/main/java/mods/flammpfeil/slashblade/client/renderer/entity/BladeFirstPersonRender.java",
+    "normal_old_style_operations": [
+      ["sync_pitch_x_degrees", "player_interpolated_pitch"],
+      ["translate", -0.35, -0.1, -0.8],
+      ["rotate_axis_degrees", -3.0, 1.0, 0.0, 0.0],
+      ["rotate_axis_degrees", 180.0, 0.0, 0.0, 1.0],
+      ["translate", 0.0, 0.25, 0.0],
+      ["rotate_axis_degrees", -25.0, 0.9, 0.1, 0.0],
+      ["scale", 1.2, 1.0, 1.0]
+    ],
+    "barrier_old_style_operations": [
+      ["sync_pitch_x_degrees", "player_interpolated_pitch"],
+      ["translate", 0.0, 0.1, -0.8],
+      ["rotate_axis_degrees", -30.0, 1.0, 0.0, 0.0],
+      ["rotate_axis_degrees", 180.0, 0.0, 0.0, 1.0],
+      ["translate", 0.0, 0.25, 0.0],
+      ["rotate_axis_degrees", -25.0, 0.9, 0.1, 0.0],
+      ["scale", 1.2, 1.0, 1.0]
+    ],
+    "notes": [
+      "The old renderer owns first-person placement in Java and branches on ProjectileBarrier availability.",
+      "It then renders the same LayerSlashBlade procedural blade/sheath layer used for classic attack motion."
+    ]
+  },
+  "target": {
+    "repository": "0999312/SlashBlade_Resharped",
+    "commit": "6e2a0a092fb794d7ea56fd83452869674f3ab1c7",
+    "teisr_file": "src/main/java/mods/flammpfeil/slashblade/client/renderer/SlashBladeTEISR.java",
+    "first_person_file": "src/main/java/mods/flammpfeil/slashblade/client/renderer/model/BladeFirstPersonRender.java",
+    "normal_operations": [
+      ["reset_current_pose_to_identity"],
+      ["translate", 0.0, 0.0, -0.5],
+      ["rotate_axis_degrees", 180.0, 0.0, 0.0, 1.0],
+      ["scale", 1.2, 1.0, 1.0],
+      ["rotate_x_degrees", "-player_pitch"]
+    ],
+    "incoming_item_display_transform_survives": false,
+    "reason": "BladeFirstPersonRender resets the current PoseStack pose and normal matrices to identity before applying its hard-coded transform.",
+    "blade_motion_after_fpv_transform": "LayerMainBlade renders the same VMD-driven hardpointA/hardpointB motion used outside first person."
+  },
+  "resource_pack_classification": {
+    "classic_attack_blade_sheath_motion_visible_in_first_person": "SUPPORTED",
+    "replace_static_first_person_camera_relative_hold_transform_only": "IMPOSSIBLE_RESOURCE_PACK_ONLY",
+    "restore_legacy_projectile_barrier_first_person_branch": "IMPOSSIBLE_RESOURCE_PACK_ONLY",
+    "restore_legacy_pitch_sync_policy": "IMPOSSIBLE_RESOURCE_PACK_ONLY",
+    "use_item_model_firstperson_display_to_override_slashblade_hold": "INEFFECTIVE_ON_PINNED_TARGET",
+    "global_model_or_vmd_offset_as_fpv_fix": "REJECTED_BECOMES_THIRD_PERSON_REGRESSION"
+  }
+}
