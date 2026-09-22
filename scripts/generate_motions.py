@@ -13,7 +13,8 @@ ROOT=Path(__file__).resolve().parents[1]
 VMD_FPS=30
 GAME_TPS=20
 VANILLA_SWING_FRAMES=9
-DIRECT_NONE_MOVES={'SlashDim','Iai','SIai'}
+DIRECT_NONE_MOVES={'SlashDim','Iai','SIai','Noutou'}
+ADAPTATION_CLASSES={'CLASSIC_RESTORATION','CLASSIC_INTERPRETATION'}
 
 def mix(a,b,t):
     return tuple(x+(y-x)*t for x,y in zip(a[0],b[0])),slerp(a[1],b[1],t)
@@ -49,9 +50,10 @@ def resolve_recovery(slot,combos):
 def timeout_target(slot,combos):
     """Return the r32 visual state entered after the final mapped move times out.
 
-    In ItemSlashBlade.onUpdate, saya moves and SlashDim/Iai/SIai reset straight
-    to None. Other non-saya moves enter Noutou and restart the vanilla swing.
-    The mapped moves used by this pack do not rely on a scabbard mainHandCombo.
+    In ItemSlashBlade.onUpdate, saya moves, SlashDim/Iai/SIai and Noutou reset
+    straight to None. Other non-saya moves enter Noutou and restart the vanilla
+    swing. The mapped moves used by this pack do not rely on a scabbard
+    mainHandCombo.
     """
     name,_=last_legacy_move(slot)
     combo=combos[name]
@@ -77,6 +79,9 @@ def generate(output):
     modern=json.loads((ROOT/'data/resharped_blade_frame_map.json').read_text())['entries']
     keys={};report=[]
     for slot in slots:
+        adaptation=slot.get('adaptation')
+        if adaptation not in ADAPTATION_CLASSES:
+            raise ValueError(f"{slot['name']} has invalid adaptation class {adaptation!r}")
         start,end=slot['start'],slot['end'];recovery=resolve_recovery(slot,combos)
         name=slot['legacy'];combo=combos[name]
         source_timeout=slot.get('recovery_mode')=='legacy_reset'
@@ -99,9 +104,9 @@ def generate(output):
                     idle=pose(combos['None'],0,sheath)
                     if source_timeout:
                         # Reproduce the old state transition instead of inventing
-                        # a long modern recovery. Saya/Iai-family moves reset to
-                        # None. Other blade moves enter Noutou and start a fresh
-                        # six-tick vanilla swing before becoming neutral.
+                        # a long modern recovery. Saya/Iai-family/Noutou moves
+                        # reset to None. Other blade moves enter Noutou and start
+                        # a fresh six-tick vanilla swing before becoming neutral.
                         if target=='none':
                             result=idle
                         else:
@@ -128,7 +133,7 @@ def generate(output):
                             elif elapsed<bridge+swing:result=pose(combos['Noutou'],(elapsed-bridge)/swing,sheath)
                             else:result=idle
                 keys[(bone,f)]=Key(bone,f,*result)
-        report.append(dict(slot=slot['name'],legacy=name,frames=[start,end],recovery=recovery,
+        report.append(dict(slot=slot['name'],legacy=name,adaptation=adaptation,frames=[start,end],recovery=recovery,
                            timeout_target=target,status=slot['status']))
     # Fill genuinely unused gaps with neutral pose. Never interpolate across slots.
     max_frame=max(r['end'] for r in modern if r['resource']=='slashblade:combostate/motion.vmd')
