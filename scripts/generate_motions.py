@@ -13,6 +13,7 @@ ROOT=Path(__file__).resolve().parents[1]
 VMD_FPS=30
 GAME_TPS=20
 VANILLA_SWING_FRAMES=9
+NOUTOU_ENTRY_DELAY_TICKS=5
 DIRECT_NONE_MOVES={'SlashDim','Iai','SIai','Noutou'}
 ADAPTATION_CLASSES={'CLASSIC_RESTORATION','CLASSIC_INTERPRETATION'}
 PIERCING_ACTIVE_FRAME=33
@@ -21,9 +22,22 @@ PIERCING_MAX_FRAME=90
 def mix(a,b,t):
     return tuple(x+(y-x)*t for x,y in zip(a[0],b[0])),slerp(a[1],b[1],t)
 
-def legacy_reset_frames(combo):
-    """Convert r32 comboResetTicks to the 30 Hz VMD atlas clock."""
-    return round(combo['reset_ticks']*VMD_FPS/GAME_TPS)
+def legacy_reset_frames(combo,entry_delay_ticks=0):
+    """Convert r32 comboResetTicks (+ an optional entry clock offset) to VMD frames."""
+    return round((combo['reset_ticks']+entry_delay_ticks)*VMD_FPS/GAME_TPS)
+
+def noutou_state_frames(combos):
+    """Visible r32 Noutou lifetime after a normal blade timeout.
+
+    r32 does not merely play one six-tick swing and immediately become None.
+    The transition into Noutou stores LastActionTime=currentTime+5, then Noutou's
+    own five-tick reset clock runs.  The swing reaches its final pose after six
+    ticks and that pose is held until the delayed Noutou state actually expires.
+    We use the server-side source clock here, matching the other legacy-reset
+    conversions in this baker.
+    """
+    frames=legacy_reset_frames(combos['Noutou'],NOUTOU_ENTRY_DELAY_TICKS)
+    return max(VANILLA_SWING_FRAMES,frames)
 
 def last_legacy_move(slot):
     if slot.get('segments'):
@@ -39,11 +53,14 @@ def resolve_recovery(slot,combos):
     Embedded multi-move slots use their final legacy move as the recovery clock
     origin. The resolved reset is clamped to the modern atlas window because a
     resource pack cannot keep controlling a state after Resharped leaves it.
+    `legacy_entry_delay_ticks` models source-side clock offsets such as r32's
+    `LastActionTime = currentTime + 5` when entering Noutou.
     """
     if slot.get('recovery_mode')!='legacy_reset':
         return slot['recovery_start']
     name,origin=last_legacy_move(slot)
-    resolved=min(slot['end'],origin+legacy_reset_frames(combos[name]))
+    entry_delay=slot.get('legacy_entry_delay_ticks',0)
+    resolved=min(slot['end'],origin+legacy_reset_frames(combos[name],entry_delay))
     declared=slot.get('recovery_start')
     if declared is not None and declared!=resolved:
         raise ValueError(f"{slot['name']} recovery_start={declared}, expected legacy reset {resolved}")
@@ -53,15 +70,26 @@ def timeout_target(slot,combos):
     """Return the r32 visual state entered after the final mapped move times out.
 
     In ItemSlashBlade.onUpdate, saya moves, SlashDim/Iai/SIai and Noutou reset
-    straight to None. Other non-saya moves enter Noutou and restart the vanilla
-    swing. The mapped moves used by this pack do not rely on a scabbard
-    mainHandCombo.
+    straight to None. A move whose `mainHandCombo` is itself a saya/scabbard move
+    also resets directly to None. Other non-saya moves enter Noutou and restart
+    the vanilla swing.
     """
     name,_=last_legacy_move(slot)
     combo=combos[name]
-    if combo['scabbard'] or name in DIRECT_NONE_MOVES:
+    main_name=combo.get('main_hand_combo')
+    main_scabbard=bool(main_name and main_name in combos and combos[main_name]['scabbard'])
+    if combo['scabbard'] or main_scabbard or name in DIRECT_NONE_MOVES:
         return 'none'
     return 'noutou'
+
+def noutou_recovery_pose(frame,recovery,combos,sheath):
+    """Pose the delayed r32 Noutou state entered after a blade move times out."""
+    elapsed=frame-recovery
+    if elapsed<VANILLA_SWING_FRAMES:
+        return pose(combos['Noutou'],elapsed/VANILLA_SWING_FRAMES,sheath)
+    if elapsed<noutou_state_frames(combos):
+        return pose(combos['Noutou'],1,sheath)
+    return pose(combos['None'],0,sheath)
 
 def passthrough_pmd():
     # Bone-only PMD, no borrowed mesh. Unknown body-part names cause the existing
@@ -82,7 +110,8 @@ def classic_piercing_motions(combos):
     lunge and area hit. r32's Stinger is the closest classic semantic match and
     intentionally evaluates at full thrust progress; its 20-tick reset clock is
     preserved on the 30 Hz atlas, so recovery begins at frame 63. Non-saya r32
-    moves then enter a fresh Noutou swing before returning to None.
+    moves then enter the delayed Noutou state: a fresh six-tick swing reaches the
+    final pose, which remains held until the source Noutou clock expires.
 
     The matching player VMD is a passthrough track so Resharped's modern full-body
     Piercing clip does not fight the classic blade path. Movement/hit timing stays
@@ -98,8 +127,7 @@ def classic_piercing_motions(combos):
             elif f<recovery:
                 result=pose(combos['Stinger'],1,sheath)
             else:
-                t=(f-recovery)/VANILLA_SWING_FRAMES
-                result=pose(combos['Noutou'],min(1,t),sheath) if t<1 else idle
+                result=noutou_recovery_pose(f,recovery,combos,sheath)
             blade.append(Key(bone,f,*result))
     for bone in ('センター','JointA1','JointA2','JointA3','JointB1','JointB2','JointB3'):
         for f in (0,PIERCING_MAX_FRAME):
@@ -142,13 +170,13 @@ def generate(output):
                     if source_timeout:
                         # Reproduce the old state transition instead of inventing
                         # a long modern recovery. Saya/Iai-family/Noutou moves
-                        # reset to None. Other blade moves enter Noutou and start
-                        # a fresh six-tick vanilla swing before becoming neutral.
+                        # reset to None. Other blade moves enter Noutou, run a
+                        # fresh six-tick swing, then hold its final pose until the
+                        # delayed source Noutou state actually expires.
                         if target=='none':
                             result=idle
                         else:
-                            t=(f-recovery)/VANILLA_SWING_FRAMES
-                            result=pose(combos['Noutou'],min(1,t),sheath) if t<1 else idle
+                            result=noutou_recovery_pose(f,recovery,combos,sheath)
                     else:
                         last_name=slot['segments'][-1]['legacy'] if slot.get('segments') else slot.get('second_legacy',name)
                         active=combos[last_name]
@@ -170,8 +198,9 @@ def generate(output):
                             elif elapsed<bridge+swing:result=pose(combos['Noutou'],(elapsed-bridge)/swing,sheath)
                             else:result=idle
                 keys[(bone,f)]=Key(bone,f,*result)
+        neutral=(recovery+noutou_state_frames(combos)) if target=='noutou' else recovery
         report.append(dict(slot=slot['name'],legacy=name,adaptation=adaptation,frames=[start,end],recovery=recovery,
-                           timeout_target=target,status=slot['status']))
+                           timeout_target=target,neutral=min(end,neutral),status=slot['status']))
     # Fill genuinely unused gaps with neutral pose. Never interpolate across slots.
     max_frame=max(r['end'] for r in modern if r['resource']=='slashblade:combostate/motion.vmd')
     for f in range(max_frame+1):
@@ -195,7 +224,8 @@ def generate(output):
     (dest/'combostate/piercing_pl.vmd').write_bytes(piercing_player.encode())
     report.append(dict(slot='Piercing dedicated atlas',legacy='Stinger',adaptation='CLASSIC_INTERPRETATION',
                        frames=[1,PIERCING_MAX_FRAME],recovery=piercing_recovery,
-                       timeout_target='noutou',status='APPROXIMATE'))
+                       timeout_target='noutou',neutral=min(PIERCING_MAX_FRAME,piercing_recovery+noutou_state_frames(combos)),
+                       status='APPROXIMATE'))
     return report
 
 if __name__=='__main__':

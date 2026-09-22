@@ -9,8 +9,8 @@ Record exact Resharped JAR version/hash, Forge version, dependency versions, pac
 | A1 (Saya1) | NOT RUN | |
 | A2 (Saya2) | NOT RUN | |
 | A3 | NOT RUN | |
-| A4 normal | NOT RUN | |
-| A4 EX → A5 powered | NOT RUN | |
+| A4 normal | NOT RUN | verify delayed Noutou final-pose hold after the six-tick swing |
+| A4 EX → A5 powered | NOT RUN | verify delayed Noutou final-pose hold after timeout |
 | B1–B7 | NOT RUN | |
 | C | NOT RUN | |
 | Circle Slash | NOT RUN | |
@@ -21,13 +21,13 @@ Record exact Resharped JAR version/hash, Forge version, dependency versions, pac
 | Rapid Slash / quick | NOT RUN | |
 | Rising Star | NOT RUN | |
 | Judgement Cut / air / just / end | NOT RUN | installed `slashdim` art is already r32-identical; judge Java choreography separately |
-| Void Slash | NOT RUN | global classic trail adapter applies to its long-lived `EntitySlashEffect` too |
+| Void Slash | NOT RUN | SlashDim now begins at modern tick 16 / VMD frame 2224; global classic trail adapter applies to its long-lived `EntitySlashEffect` too |
 | Sakura End ground/air/finish | NOT RUN | |
 | Drive horizontal/vertical | NOT RUN | verify restored prism orientation and scale |
 | Wave Edge | NOT RUN | verify restored prism orientation and scale |
 | Guard recovery | NOT RUN | |
 | Idle / draw / sheath | NOT RUN | |
-| Piercing / Piercing Just | NOT RUN | generated Stinger interpretation + passthrough player VMD; verify modern lunge alignment |
+| Piercing / Piercing Just | NOT RUN | generated Stinger interpretation + delayed Noutou hold + passthrough player VMD; verify modern lunge alignment |
 
 For every move:
 
@@ -37,10 +37,11 @@ For every move:
 - [ ] Blade does not unexpectedly cross the body; saya follows intended scabbard strikes.
 - [ ] Start/end poses have no unwanted teleport, snap or unintended intermediate frame.
 - [ ] Slow, normal and earliest possible combo inputs; record discontinuities rather than hiding them.
-- [ ] Sheathe/draw and timeout transitions are natural; compare holding versus continuing.
+- [ ] Sheathe/draw and timeout transitions are natural; compare holding versus continuing. For non-saya r32 timeout paths, verify that Noutou reaches its final pose after the six-tick swing and holds briefly before returning to neutral instead of snapping neutral immediately.
 - [ ] Walk, run, crouch, jump, land, turn and both skin types.
 - [ ] Other client sees remote-player animation; pack installed on observing client.
 - [ ] Existing server gameplay, projectile timing and damage remain unchanged.
+- [ ] Compare audio separately from motion. Resharped keeps Java-selected modern SoundEvents/pitch/timing; a normal resource pack cannot restore those calls independently without globally replacing vanilla sound assets.
 - [ ] Test enable-after-start and restart behavior; record the cache limitation.
 - [ ] Capture modern control / candidate / r32 clips at the same playback speed.
 
@@ -60,9 +61,20 @@ Specific checks:
 - [ ] Test Projectile Barrier. Do not expect r32's special first-person branch: that branch is Java-only and `IMPOSSIBLE_RESOURCE_PACK_ONLY` in phase one.
 - [ ] Do not introduce a global model/PMD/VMD offset merely to improve FPV if it worsens third-person weapon placement.
 
+## Void Slash pass
+
+Void Slash had a source/modern timing mismatch in an earlier candidate: the SlashDim bake began at frame 2200 even though Resharped does not call `doVoidSlashAttack` until elapsed tick 16. The current candidate delays the visual attack to the matching frame offset.
+
+- [ ] Frames 2200–2223 read as preparation/hold, not as a completed early SlashDim strike.
+- [ ] At elapsed tick 16 / VMD frame 2224, the SlashDim gesture begins at the same moment Resharped starts the Void Slash release/body-rotation phase.
+- [ ] SlashDim resets to neutral at frame 2236; the later long-lived Java effect may continue moving/rotating independently and must be judged as a resource-pack ceiling.
+- [ ] At frame 2278, the dedicated modern sheath state starts a fresh Noutou gesture.
+- [ ] Noutou reaches its final swing pose at frame 2287, holds it through frame 2292, and returns to neutral at frame 2293.
+- [ ] Listen for the modern Void/quick-sheath sounds separately; Java sound timing is not source-restored by this pack.
+
 ## Piercing pass
 
-Piercing is now a dedicated resource-only Classic Interpretation rather than an upstream fallback. Its binary timing is source-checked; runtime alignment is still visual work:
+Piercing is a dedicated resource-only Classic Interpretation rather than an upstream fallback. Its binary timing is source-checked; runtime alignment is still visual work:
 
 - [ ] Frames 1–32 read as a stable classic neutral preparation rather than a broken/frozen modern clip.
 - [ ] At the modern lunge start (frame 33), the blade snaps into the r32 `Stinger` full-thrust pose at the same moment the Java movement begins.
@@ -70,7 +82,9 @@ Piercing is now a dedicated resource-only Classic Interpretation rather than an 
 - [ ] `piercing_just` beginning at frame 34 still reads correctly when entering one frame after the main active-state boundary.
 - [ ] At frame 63, the old 20-tick Stinger reset clock begins `Noutou`; the transition is not an obvious teleport.
 - [ ] The modern quick-sheath sound at frame 65 lands plausibly during the generated Noutou gesture.
-- [ ] By frame 72 the blade/saya are back at the r32 neutral pose and remain stable through frame 90.
+- [ ] At frame 72, the six-tick Noutou swing has reached its final pose but **must not** have snapped neutral yet.
+- [ ] Frames 72–77 hold the final Noutou pose, reproducing the old `LastActionTime = currentTime + 5` delayed state lifetime.
+- [ ] At frame 78 the blade/saya return to the r32 neutral pose and remain stable through frame 90.
 - [ ] The generated `piercing_pl.vmd` passthrough leaves the body readable during the Java lunge; no modern full-body Piercing pose should reappear from another pack with higher priority.
 - [ ] Do not attribute forward distance, area hit, just-window timing or cancel behavior to this pack. Those remain Resharped Java.
 

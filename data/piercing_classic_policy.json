@@ -21,7 +21,8 @@
     "active_frame": 33,
     "recovery_frame": 63,
     "recovery_move": "Noutou",
-    "neutral_frame": 72
+    "noutou_entry_delay_ticks": 5,
+    "neutral_frame": 78
   },
   "player_body": {
     "strategy": "passthrough",
@@ -34,5 +35,5 @@
     "input/just timing",
     "state transitions"
   ],
-  "notes": "Frames 1..32 keep the classic neutral blade/saya pose. The modern lunge begins at frame 33, where the blade switches to the r32 Stinger full-thrust pose. Stinger's 20-tick reset clock converts to 30 VMD frames, so Noutou recovery starts at frame 63 and reaches neutral at frame 72. This is a visual interpretation, not a claim that modern Piercing existed in r32."
+  "notes": "Frames 1..32 keep the classic neutral blade/saya pose. The modern lunge begins at frame 33, where the blade switches to the r32 Stinger full-thrust pose. Stinger's 20-tick reset clock converts to 30 VMD frames, so Noutou recovery starts at frame 63. In r32, entering Noutou sets LastActionTime=currentTime+5 before Noutou's own five-tick reset clock runs; the six-tick swing therefore reaches its final pose and holds until frame 78 before returning to neutral. This is a visual interpretation, not a claim that modern Piercing existed in r32."
 }

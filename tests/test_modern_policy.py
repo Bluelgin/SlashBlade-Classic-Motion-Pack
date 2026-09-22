@@ -82,13 +82,15 @@ class ModernClassicPolicyTests(unittest.TestCase):
         attack = self.slot_by_name['Void Slash']
         sheath = self.slot_by_name['Void Slash sheath']
         self.assertEqual((attack['start'], attack['end'], attack['legacy']), (2200, 2277, 'SlashDim'))
+        self.assertEqual(attack['attack_offset'], 24)
         self.assertEqual((sheath['start'], sheath['end'], sheath['legacy']), (2278, 2299, 'Noutou'))
+        self.assertEqual(sheath['legacy_entry_delay_ticks'], 5)
         self.assertEqual(timeout_target(attack, self.combos), 'none')
-        # r32's Noutou state itself terminates to None; it must not recursively
-        # start another Noutou cycle when used as a modern interpretation clip.
+        # r32's Noutou state itself terminates to None; the +5 source clock
+        # offset is represented by this slot's legacy_entry_delay_ticks.
         self.assertEqual(timeout_target(sheath, self.combos), 'none')
 
-    def test_encoded_void_sheath_uses_real_noutou_then_neutral(self):
+    def test_encoded_void_sheath_uses_full_source_timed_noutou_then_neutral(self):
         with tempfile.TemporaryDirectory() as tmp:
             output = Path(tmp)
             report = {entry['slot']: entry for entry in generate(output)}
@@ -96,8 +98,9 @@ class ModernClassicPolicyTests(unittest.TestCase):
             keys = {(key.bone, key.frame): key for key in motion.keys}
 
             self.assertEqual(report['Void Slash']['adaptation'], 'CLASSIC_INTERPRETATION')
+            self.assertEqual(report['Void Slash']['recovery'], 2236)
             self.assertEqual(report['Void Slash sheath']['adaptation'], 'CLASSIC_INTERPRETATION')
-            self.assertEqual(report['Void Slash sheath']['recovery'], 2286)
+            self.assertEqual(report['Void Slash sheath']['recovery'], 2293)
             self.assertEqual(report['Void Slash sheath']['timeout_target'], 'none')
 
             for bone, is_sheath in (('hardpointA', False), ('hardpointB', True)):
@@ -112,7 +115,17 @@ class ModernClassicPolicyTests(unittest.TestCase):
                     f'Void sheath mid {bone}',
                 )
                 self.assert_key_pose(
-                    keys[(bone, 2286)],
+                    keys[(bone, 2287)],
+                    pose(self.combos['Noutou'], 1, is_sheath),
+                    f'Void sheath final swing pose {bone}',
+                )
+                self.assert_key_pose(
+                    keys[(bone, 2292)],
+                    pose(self.combos['Noutou'], 1, is_sheath),
+                    f'Void sheath hold {bone}',
+                )
+                self.assert_key_pose(
+                    keys[(bone, 2293)],
                     pose(self.combos['None'], 0, is_sheath),
                     f'Void sheath timeout {bone}',
                 )
