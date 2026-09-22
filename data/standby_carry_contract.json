@@ -1,0 +1,69 @@
+{
+  "schema": 1,
+  "legacy": {
+    "repository": "flammpfeil/SlashBlade",
+    "commit": "ba1ef8604c0971f68336b882b42a868df7f32f0b",
+    "layer_file": "src/main/java/mods/flammpfeil/slashblade/client/renderer/entity/layers/LayerSlashBlade.java",
+    "standby_render_type_ordinals": {
+      "NONE": 0,
+      "DEFAULT": 1,
+      "PSO2": 2,
+      "NINJA": 3
+    },
+    "active_main_hand_base": [
+      ["translate", 0.25, 0.4, -0.5],
+      ["scale", 0.075, 0.075, 0.075],
+      ["rotate_x_degrees", 60.0],
+      ["rotate_z_degrees", -20.0],
+      ["rotate_y_degrees", 90.0]
+    ],
+    "back_default": [
+      ["translate", 0.25, 0.4, -0.5],
+      ["scale", 0.075, 0.075, 0.075],
+      ["rotate_x_degrees", 60.0],
+      ["rotate_z_degrees", -20.0],
+      ["rotate_y_degrees", 90.0]
+    ],
+    "back_pso2": [
+      ["translate", 0.0, 0.5, 0.25],
+      ["scale", 0.075, 0.075, 0.075],
+      ["rotate_z_degrees", 83.0],
+      ["translate", 0.0, -12.5, 0.0]
+    ],
+    "back_ninja": [
+      ["translate", 0.0, 0.4, 0.25],
+      ["scale", 0.075, 0.075, 0.075],
+      ["rotate_z_degrees", -30.0],
+      ["rotate_y_degrees", -180.0],
+      ["translate", 0.0, -12.5, 0.0]
+    ],
+    "model_local_scale": 0.095
+  },
+  "target": {
+    "repository": "0999312/SlashBlade_Resharped",
+    "commit": "6e2a0a092fb794d7ea56fd83452869674f3ab1c7",
+    "layer_file": "src/main/java/mods/flammpfeil/slashblade/client/renderer/layers/LayerMainBlade.java",
+    "state_file": "src/main/java/mods/flammpfeil/slashblade/capability/slashblade/ISlashBladeState.java",
+    "carry_type_ordinals": {
+      "NONE": 0,
+      "DEFAULT": 1,
+      "PSO2": 2,
+      "NINJA": 3,
+      "KATANA": 4,
+      "RNINJA": 5
+    },
+    "serialized_nbt_key": "StandbyRenderType",
+    "standby_motion_frames": [0, 1],
+    "standby_motion_resource": "slashblade:combostate/motion.vmd",
+    "back_carry_renderer": "renderStandbyBlade",
+    "back_carry_transform_is_java_hardcoded": true
+  },
+  "resource_pack_classification": {
+    "main_hand_none_standby_blade_sheath_pose": "SUPPORTED_VIA_MOTION_VMD",
+    "classic_default_back_carry_transform": "IMPOSSIBLE_RESOURCE_PACK_ONLY",
+    "classic_pso2_back_carry_transform": "IMPOSSIBLE_RESOURCE_PACK_ONLY",
+    "classic_ninja_back_carry_transform": "IMPOSSIBLE_RESOURCE_PACK_ONLY",
+    "modern_katana_rninja_carry_types": "TARGET_ONLY_RUNTIME_BEHAVIOR",
+    "per_blade_adjust_xyz_state": "RUNTIME_STATE_NOT_RESOURCE_PACK_CONTROLLED"
+  }
+}
