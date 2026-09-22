@@ -70,13 +70,15 @@ def timeout_target(slot,combos):
     """Return the r32 visual state entered after the final mapped move times out.
 
     In ItemSlashBlade.onUpdate, saya moves, SlashDim/Iai/SIai and Noutou reset
-    straight to None. Other non-saya moves enter Noutou and restart the vanilla
-    swing. The mapped moves used by this pack do not rely on a scabbard
-    mainHandCombo.
+    straight to None. A move whose `mainHandCombo` is itself a saya/scabbard move
+    also resets directly to None. Other non-saya moves enter Noutou and restart
+    the vanilla swing.
     """
     name,_=last_legacy_move(slot)
     combo=combos[name]
-    if combo['scabbard'] or name in DIRECT_NONE_MOVES:
+    main_name=combo.get('main_hand_combo')
+    main_scabbard=bool(main_name and main_name in combos and combos[main_name]['scabbard'])
+    if combo['scabbard'] or main_scabbard or name in DIRECT_NONE_MOVES:
         return 'none'
     return 'noutou'
 
