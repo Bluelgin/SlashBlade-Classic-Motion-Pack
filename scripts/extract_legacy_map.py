@@ -20,8 +20,14 @@ def extract(source):
     s=(source/'src/main/java/mods/flammpfeil/slashblade/item/ItemSlashBlade.java').read_text()
     block=s[s.index('public enum ComboSequence'):s.index('public boolean useScabbard;')]
     rows=[]
-    for name,sc,a,d,ch,t in re.findall(r'(\w+)\((true|false),\s*([\d.fF+ -]+),\s*([\d.fF+ -]+),(true|false),(\d+)',block):
-        rows.append(dict(name=name,scabbard=sc=='true',amplitude=number(a),direction=number(d),charged=ch=='true',reset_ticks=int(t)))
+    pattern=(r'(\w+)\((true|false),\s*([\d.fF+ -]+),\s*([\d.fF+ -]+),'
+             r'(true|false),(\d+)(?:,\s*(\w+))?\)')
+    for name,sc,a,d,ch,t,main_hand in re.findall(pattern,block):
+        row=dict(name=name,scabbard=sc=='true',amplitude=number(a),direction=number(d),
+                 charged=ch=='true',reset_ticks=int(t))
+        if main_hand:
+            row['main_hand_combo']=main_hand
+        rows.append(row)
     if len(rows)!=34:raise ValueError('Unexpected legacy enum layout')
     return dict(commit='ba1ef8604c0971f68336b882b42a868df7f32f0b',minecraft='1.12.2',version='mc1.12-r32',representation='procedural; no legacy VMD',entries=rows)
 
