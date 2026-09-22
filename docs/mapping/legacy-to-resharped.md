@@ -13,7 +13,7 @@ Player bodies for every row use the separately documented vanilla-pose adapter, 
 |---|---|---|---|
 | A1 | Saya1 | 1–41 | REMAP |
 | A2 | Saya2 | 100–151 | REMAP |
-| A3 / Sakura right | Battou | 200–314 | APPROXIMATE |
+| A3 / Sakura right | SIai | 200–314 | APPROXIMATE |
 | C / Drive horizontal | Battou | 400–488 | APPROXIMATE |
 | A4 | SSlashEdge | 500–608 | APPROXIMATE |
 | B / Circle | SSlashBlade | 700–787 | APPROXIMATE |
@@ -36,17 +36,34 @@ Player bodies for every row use the separately documented vanilla-pose adapter, 
 |---|---|---|
 | Guard / A1_END2 | Shared A1 recovery; old ProjectileBarrier uses Java-driven rotations/effects, not an independent compatible clip | APPROXIMATE |
 | Idle | Old None placement; underlying modern vanilla body | REMAP |
-| Draw | Battou at A3; source says earlier ground attacks are saya strikes | REMAP |
+| Quick draw route | A1 Saya1 → A2 Saya2 → A3 SIai; modern A4/A4_EX then continues with SSlashEdge-family motion | APPROXIMATE |
+| Delayed draw route | A1 Saya1 → A2 Saya2 → C Battou | APPROXIMATE |
 | Sheathe | Old Noutou plus short recovery bridges; saya-only return is an adapted bridge | APPROXIMATE |
 | Sprint/air movement | Existing modern body and entity movement | IMPOSSIBLE_RESOURCE_PACK_ONLY |
 | Piercing | Modern blade asset unchanged; old Stinger is only a researched future candidate | APPROXIMATE (not restored) |
 | Damage, impacts, invulnerability, cancel windows, entity velocity | Java state/action callbacks | IMPOSSIBLE_RESOURCE_PACK_ONLY |
 
+## Ground branch decision after Saya2
+
+Official r32 does not always send `Saya2` to the same draw. Its `getNextComboSeq` sends the player to `Battou` when stylish rank is below 5 **or** the follow-up is late; otherwise the fast high-rank route uses `SIai`. `SIai` then continues to `SSlashEdge`, `SReturnEdge`, and `SSlashBlade`.
+
+A resource pack cannot inspect stylish rank or replace Resharped's Java combo selector, but Resharped already exposes two different temporal exits from A2:
+
+- an accepted input while `combo_a2` is still active goes to `combo_a3`;
+- an input during the later `combo_a2_end` window goes to `combo_c`.
+
+The atlas therefore maps **A3 to SIai** and **C to Battou**. This is still approximate because the modern branch does not reproduce r32's rank test, and C shares its frames with Horizontal Drive. It is nevertheless semantically coherent in a way that mapping both branches to Battou is not:
+
+- quick visual route: `Saya1 → Saya2 → SIai → SSlashEdge ...`;
+- delayed visual route: `Saya1 → Saya2 → Battou → Noutou`.
+
+The powered modern continuation is also useful: `A4_EX → A5` has enough visual space for `SSlashEdge → SReturnEdge → SSlashBlade`, although the modern hit callbacks and state timing remain authoritative.
+
 ## Shared-slot decisions
 
 - A1_END2 replays 21–41 and therefore necessarily sees A1 recovery.
 - B2–B7 share 710 onward; Circle starts at 725. The candidate samples repeated SSlashBlade motions at those entry points so they do not become static holds. Reset jumps are possible and need runtime refinement.
-- Sakura right uses A3 subranges, with finish extending to 314; the atlas covers the extension.
+- Sakura right uses A3 subranges, with finish extending to 314; the atlas covers the extension. It necessarily sees the same SIai-family motion as A3.
 - Sakura left and Aerial Cleave landing share 1816–1859. The loop 1812–1817 stays held; a Kiriorosi approximation begins at 1818. This does not recreate two independent moves.
 - Horizontal Drive shares C; Vertical Drive and Wave Edge share Upper Slash. Their projectiles remain Java-driven.
 - Judgement's actual slash window begins at 1923, so the SlashDim swing is placed there, not in the preparation window. This one five-frame slot compresses the visual; non-unit speed timeout transitions remain a limitation.
