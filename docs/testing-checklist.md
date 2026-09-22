@@ -20,11 +20,11 @@ Record exact Resharped JAR version/hash, Forge version, dependency versions, pac
 | Upper Slash / jump | NOT RUN | |
 | Rapid Slash / quick | NOT RUN | |
 | Rising Star | NOT RUN | |
-| Judgement Cut / air / just / end | NOT RUN | |
-| Void Slash | NOT RUN | |
+| Judgement Cut / air / just / end | NOT RUN | installed `slashdim` art is already r32-identical; judge Java choreography separately |
+| Void Slash | NOT RUN | global classic trail adapter applies to its long-lived `EntitySlashEffect` too |
 | Sakura End ground/air/finish | NOT RUN | |
-| Drive horizontal/vertical | NOT RUN | |
-| Wave Edge | NOT RUN | |
+| Drive horizontal/vertical | NOT RUN | verify restored prism orientation and scale |
+| Wave Edge | NOT RUN | verify restored prism orientation and scale |
 | Guard recovery | NOT RUN | |
 | Idle / draw / sheath | NOT RUN | |
 | Piercing regression | NOT RUN | |
@@ -43,4 +43,27 @@ For every move:
 - [ ] Test enable-after-start and restart behavior; record the cache limitation.
 - [ ] Capture modern control / candidate / r32 clips at the same playback speed.
 
-Release gate: observed visual differences, frame-alignment evidence and review of the passthrough-player compromise are required before calling A1 PoC or A1–A5 runtime-complete. Static VMD/ZIP validation alone cannot check these boxes.
+## Classic trail / effect pass
+
+For every attack that emits the normal `EntitySlashEffect` (ground A/B/C chains, air chains, Rapid/Rising/Sakura and other `AttackManager.doSlash` callers):
+
+- [ ] The modern broad radial disc is replaced by a narrow, tapered classic-looking afterimage.
+- [ ] The trail is on the same visual side of the weapon swing and does not appear mirrored.
+- [ ] At the actual hit/swing moment the brightest core is close enough to the classic blade path to read as one motion.
+- [ ] On fast multi-hit moves, repeated trail entities do not form an opaque modern-looking wheel.
+- [ ] On slow/long-lived Void Slash, record whether Resharped's fixed `rotationOffset - 135° * progress` causes the ribbon to rotate after the classic weapon motion has ended. If so, mark the residual as `IMPOSSIBLE_RESOURCE_PACK_ONLY`, not as an OBJ bug.
+- [ ] Low and high Concentration Rank: Java's black/color/white layered passes still remain readable with the neutral classic alpha mask.
+- [ ] Different blade colors tint the trail cleanly; no color is baked into the replacement texture.
+
+For Drive/Wave effects:
+
+- [ ] Horizontal Drive has the old compact prism/bolt silhouette, not an oversized plane.
+- [ ] Vertical Drive and Wave Edge are not rotated 90° off-axis by the old→modern pre-transform.
+- [ ] Alpha/color remain controlled by Resharped and fade without texture seams.
+
+For Judgement Cut:
+
+- [ ] Model/texture appearance remains unchanged from the installed Resharped baseline (the files are already r32-identical).
+- [ ] Any difference from r32 is attributed to modern seed/echo/wave/wind Java choreography unless evidence shows an asset issue.
+
+Release gate: observed visual differences, frame/effect-alignment evidence and review of the passthrough-player/resource-only compromises are required before calling A1 PoC or A1–A5 runtime-complete. Static VMD/ZIP validation alone cannot check these boxes.

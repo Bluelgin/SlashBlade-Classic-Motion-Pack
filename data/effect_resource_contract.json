@@ -1,0 +1,49 @@
+{
+  "target": {
+    "repository": "0999312/SlashBlade_Resharped",
+    "commit": "6e2a0a092fb794d7ea56fd83452869674f3ab1c7",
+    "minecraft": "1.20.1",
+    "version": "1.9.65"
+  },
+  "legacy": {
+    "repository": "flammpfeil/SlashBlade",
+    "commit": "ba1ef8604c0971f68336b882b42a868df7f32f0b",
+    "version": "mc1.12-r32"
+  },
+  "contracts": [
+    {
+      "id": "entity_slash_effect",
+      "renderer": "client/renderer/entity/SlashEffectRenderer.java",
+      "model": "slashblade:model/util/slash.obj",
+      "texture": "slashblade:model/util/slash.png",
+      "coverage": "global AttackManager.doSlash and Void Slash EntitySlashEffect visuals",
+      "policy": "CLASSIC_INTERPRETATION",
+      "pack_action": "GENERATE_CLASSIC_TRAIL_ADAPTER",
+      "java_owned": ["spawn timing", "lifetime", "rotationOffset", "rotationRoll", "baseSize", "rank passes", "color", "progress rotation"]
+    },
+    {
+      "id": "entity_drive",
+      "renderer": "client/renderer/entity/DriveRenderer.java",
+      "model": "slashblade:model/util/drive.obj",
+      "texture": "slashblade:model/util/ss.png",
+      "coverage": "Drive-family projectile/wave visual",
+      "policy": "CLASSIC_RESTORATION_VISUAL",
+      "pack_action": "BAKE_R32_PROCEDURAL_DRIVE_PRISM",
+      "java_owned": ["spawn timing", "lifetime", "entity rotation", "color", "alpha curve"]
+    },
+    {
+      "id": "entity_judgement_cut",
+      "renderer": "client/renderer/entity/JudgementCutRenderer.java",
+      "model": "slashblade:model/util/slashdim.obj",
+      "texture": "slashblade:model/util/slashdim.png",
+      "coverage": "Judgement Cut dimension effect",
+      "policy": "UPSTREAM_ALREADY_CLASSIC_ASSET",
+      "pack_action": "LEAVE_INSTALLED_RESHARPED_ASSET_UNTOUCHED",
+      "modern_model_git_blob": "9ab8de31a33970b884df9f4683ece271e9f12889",
+      "legacy_model_git_blob": "9ab8de31a33970b884df9f4683ece271e9f12889",
+      "modern_texture_git_blob": "b79daa73dd545d0a8c3c41c845b083055bd7481a",
+      "legacy_texture_git_blob": "b79daa73dd545d0a8c3c41c845b083055bd7481a",
+      "java_owned": ["seed rotation", "lifetime", "five base echoes", "three waves", "wind animation", "color"]
+    }
+  ]
+}

@@ -7,7 +7,8 @@ import sys
 import zipfile
 import zlib
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
-from scripts.generate_motions import generate
+from scripts.generate_motions import generate as generate_motions
+from scripts.generate_effects import generate as generate_effects
 from scripts.validate_pack import validate, EXPECTED
 ROOT=Path(__file__).resolve().parents[1]
 
@@ -27,7 +28,10 @@ def icon():
     return b'\x89PNG\r\n\x1a\n'+chunk(b'IHDR',struct.pack('>IIBBBBB',size,size,8,6,0,0,0))+chunk(b'IDAT',zlib.compress(b''.join(pixels),9))+chunk(b'IEND',b'')
 
 def build():
-    pack=ROOT/'pack';generate(pack);(pack/'pack.png').write_bytes(icon())
+    pack=ROOT/'pack'
+    generate_motions(pack)
+    generate_effects(pack)
+    (pack/'pack.png').write_bytes(icon())
     for name in ('README.md','LICENSE','THIRD_PARTY_NOTICES.md'):shutil.copyfile(ROOT/name,pack/name)
     validate(pack)
     out=ROOT/'dist/SlashBlade-Classic-Motion-Pack-1.20.1-v0.1.0.zip';out.parent.mkdir(exist_ok=True)

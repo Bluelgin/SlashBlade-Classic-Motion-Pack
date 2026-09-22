@@ -1,20 +1,22 @@
 # Third-party provenance and terms
 
-## Legacy procedural motion reference
+## Legacy procedural motion and effect reference
 
 - Author/project: Furia / flammpfeil, SlashBlade.
 - Minecraft: 1.12.2; project version: `mc1.12-r32`.
 - Branch/commit: `1.12.2`, `ba1ef8604c0971f68336b882b42a868df7f32f0b`.
 - Official published file: [SlashBlade-mc1.12-r32.jar, CurseForge 2882699](https://www.curseforge.com/minecraft/mc-mods/slashblade/files/2882699), uploaded by flammpfeil, 2020-02-16.
-- Referenced files: `item/ItemSlashBlade.java` (ComboSequence and transitions), `client/renderer/entity/layers/LayerSlashBlade.java` (progress function, transformation order, blade/saya drawing), under `src/main/java/mods/flammpfeil/slashblade/`.
-- Shipped derivatives: `tools/vmd/legacy.py`, `data/legacy_motion_map.json`, generated `assets/slashblade/combostate/motion.vmd`. These contain an offline adaptation of the procedural motion; they are not copied old binary assets.
+- Referenced files: `item/ItemSlashBlade.java` (ComboSequence and transitions), `client/renderer/entity/layers/LayerSlashBlade.java` (progress function, transformation order, blade/saya drawing and classic trail rendering), and `client/renderer/entity/RenderDrive.java` (procedural Drive prism), under `src/main/java/mods/flammpfeil/slashblade/`.
+- Shipped derivatives: `tools/vmd/legacy.py`, `data/legacy_motion_map.json`, generated `assets/slashblade/combostate/motion.vmd`, and the generated Resharped-coordinate Drive prism `assets/slashblade/model/util/drive.obj`. These are offline adaptations of procedural source behavior; they are not copied old binary art assets.
 
 The pinned branch's [src/main/resources/readme.txt](https://github.com/flammpfeil/SlashBlade/blob/ba1ef8604c0971f68336b882b42a868df7f32f0b/src/main/resources/readme.txt) provides a custom use condition:
 
 > 自己責任の下にるなりやくなり好きにするべし。
 > 私は責任はとらぬ。
 
-This is a broad permission to use/adapt at one's own responsibility, with no liability assumed by the author. We rely on that project-distributed condition for the procedural adaptation, retain attribution, and do **not** substitute MIT for it. The readme's version heading is stale (1.8.9); the build configuration, branch and official file identify 1.12.2/r32. The source has no blanket MIT license for its art. No legacy texture, model or VMD binary is shipped. The official JAR was identified but its binary could not be downloaded in this environment, so JAR-to-source bytecode equivalence is not asserted.
+This is a broad permission to use/adapt at one's own responsibility, with no liability assumed by the author. We rely on that project-distributed condition for the procedural adaptation, retain attribution, and do **not** substitute MIT for it. The readme's version heading is stale (1.8.9); the build configuration, branch and official file identify 1.12.2/r32. The source has no blanket MIT license for its art.
+
+The generated `slash.obj`/`slash.png` classic trail adapter is new clean-room project art informed by the narrow/tapered visual language of r32's trail, not a copy or conversion of the old `trail.obj`/`trail.png`. The generated `ss.png` is likewise original. No legacy texture, model or VMD binary is shipped. The official JAR was identified but its binary could not be downloaded in the original research environment, so JAR-to-source bytecode equivalence is not asserted.
 
 ## Modern contract reference — no art redistribution
 
@@ -22,8 +24,10 @@ This is a broad permission to use/adapt at one's own responsibility, with no lia
 - Authors credited upstream: Furia; NyMmd: nyatla; Forge OBJ importer; Resharped code: MMF-Group.
 - Commit: `6e2a0a092fb794d7ea56fd83452869674f3ab1c7`; Minecraft 1.20.1; mod 1.9.65.
 - `gradle.properties`: **MIT License, Art Resources: All Rights Reserved.**
-- Inspected files: `model/pa/player_motion.vmd` inventory, `combostate/motion.vmd` inventory, `model/bladeholder.pmd` bone hierarchy, player adapter, blade renderer, NyMmd interpolation, default resources and combo registry.
-- Redistribution status: upstream art is **not** included. The pack uses the existing installed bladeholder and game blade models. Its `model/pa/alex.pmd` is a new bone-only format adapter, not a modified copy of upstream Alex. Its player VMD contains newly generated neutral adapter keys, not upstream animation.
+- Inspected files now include the player/blade animation resources plus `SlashEffectRenderer.java`, `DriveRenderer.java`, `JudgementCutRenderer.java`, `AttackManager.java`, their entity contracts, and the corresponding `model/util` resource inventory.
+- Redistribution status: upstream modern art is **not** included. `slash.obj/png`, `drive.obj` and `ss.png` in this pack are generated project outputs rather than copies of Resharped's art. The pack uses the existing installed bladeholder and game blade models. Its `model/pa/alex.pmd` is a new bone-only format adapter, not a modified copy of upstream Alex. Its player VMD contains newly generated neutral adapter keys, not upstream animation.
+
+Resharped's `slashdim.obj` and `slashdim.png` have the same Git blob IDs as the r32 resource copies (`9ab8de31a33970b884df9f4683ece271e9f12889` and `b79daa73dd545d0a8c3c41c845b083055bd7481a`). Because the installed target already supplies those classic Judgement Cut assets, this pack deliberately does **not** redistribute them.
 
 ## Old Dream Reforged validation reference
 
@@ -38,4 +42,4 @@ Old Dream Reforged is **not** the canonical motion source for this pack and is n
 
 ## Our license boundary
 
-The existing root MIT license applies to original tooling, tests, documentation, metadata and geometric icon. It does not change the terms of upstream references or the legacy-derived motion noted above. No upstream asset is claimed as our original art. This notice is included in the runtime ZIP.
+The existing root MIT license applies to original tooling, tests, documentation, metadata, geometric icon, generated clean-room classic trail mesh/texture and generated neutral Drive texture. It does not change the terms of upstream references or the legacy-derived procedural motion/Drive geometry noted above. No upstream asset is claimed as our original art. This notice is included in the runtime ZIP.

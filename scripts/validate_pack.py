@@ -1,4 +1,4 @@
-"""Validate runtime structure, VMD data, rig and all pinned frame windows."""
+"""Validate runtime structure, generated effects, VMD data, rig and pinned frame windows."""
 import argparse
 import json
 from pathlib import Path
@@ -10,7 +10,31 @@ from tools.vmd.codec import decode
 ROOT=Path(__file__).resolve().parents[1]
 EXPECTED={'pack.mcmeta','pack.png','README.md','LICENSE','THIRD_PARTY_NOTICES.md',
           'assets/slashblade/combostate/motion.vmd',
-          'assets/slashblade/model/pa/player_motion.vmd','assets/slashblade/model/pa/alex.pmd'}
+          'assets/slashblade/model/pa/player_motion.vmd','assets/slashblade/model/pa/alex.pmd',
+          'assets/slashblade/model/util/slash.obj','assets/slashblade/model/util/slash.png',
+          'assets/slashblade/model/util/drive.obj','assets/slashblade/model/util/ss.png'}
+
+
+def _png_size(data, label):
+    if not data.startswith(b'\x89PNG\r\n\x1a\n') or data[12:16] != b'IHDR':
+        raise ValueError(f'Invalid PNG: {label}')
+    return struct.unpack('>II', data[16:24])
+
+
+def _validate_obj(data, label, minimum_faces):
+    try:text=data.decode('ascii')
+    except UnicodeDecodeError as e:raise ValueError(f'Non-ASCII generated OBJ: {label}') from e
+    lines=[line.strip() for line in text.splitlines() if line.strip() and not line.startswith('#')]
+    if 'g base' not in lines:raise ValueError(f'Missing base group: {label}')
+    vertices=[line for line in lines if line.startswith('v ')]
+    texcoords=[line for line in lines if line.startswith('vt ')]
+    faces=[line for line in lines if line.startswith('f ')]
+    if len(vertices)<8 or len(texcoords)<8 or len(faces)<minimum_faces:
+        raise ValueError(f'Effect OBJ too small: {label}')
+    if any(len(line.split()) not in (4,5) for line in faces):
+        raise ValueError(f'Unsupported face arity: {label}')
+    return len(vertices),len(faces)
+
 
 def validate(path):
     if path.is_file():
@@ -24,6 +48,16 @@ def validate(path):
     if json.loads(files['pack.mcmeta'])['pack']['pack_format']!=15:raise ValueError('Wrong pack_format')
     icon=files['pack.png']
     if not icon.startswith(b'\x89PNG\r\n\x1a\n'):raise ValueError('Invalid icon')
+
+    # These paths are hard-coded by Resharped renderers, so validating them in
+    # the final ZIP proves the resource-pack override is structurally active.
+    if _png_size(files['assets/slashblade/model/util/slash.png'],'slash.png')!=(128,32):
+        raise ValueError('Unexpected classic trail texture size')
+    if _png_size(files['assets/slashblade/model/util/ss.png'],'ss.png')!=(16,16):
+        raise ValueError('Unexpected classic Drive texture size')
+    _validate_obj(files['assets/slashblade/model/util/slash.obj'],'slash.obj',24)
+    _validate_obj(files['assets/slashblade/model/util/drive.obj'],'drive.obj',12)
+
     motions={p:decode(b) for p,b in files.items() if p.endswith('.vmd')}
     for kind in ('player','blade'):
         rows=json.loads((ROOT/f'data/resharped_{kind}_frame_map.json').read_text())['entries']
@@ -52,6 +86,6 @@ def validate(path):
 if __name__=='__main__':
     ap=argparse.ArgumentParser();ap.add_argument('path',nargs='?',type=Path,default=ROOT/'pack')
     result=validate(ap.parse_args().path)
-    print('PASS: structure, PMD adapter, all overridden frame slots and VMD records')
+    print('PASS: structure, classic effect adapters, PMD adapter, overridden frame slots and VMD records')
     for p,m in result.items():print(f'{p}: {m["key_count"]} keys, {len(m["bones"])} bones')
     print('Runtime verification pending')
