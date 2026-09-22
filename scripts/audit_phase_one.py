@@ -67,6 +67,23 @@ def main():
         if slot.get("adaptation") not in {"CLASSIC_RESTORATION", "CLASSIC_INTERPRETATION"}:
             raise SystemExit(f"unclassified adaptation: {slot['name']}")
 
+    # Source metadata must tell the same truth as the machine-readable gate.
+    root_readme = (ROOT / "README.md").read_text()
+    pack_readme = (ROOT / "pack" / "README.md").read_text()
+    if root_readme != pack_readme:
+        raise SystemExit("root README and packaged README are out of sync")
+    for required_text in (
+        "source-complete release candidate",
+        "Minecraft runtime verification pending",
+        "IMPOSSIBLE_RESOURCE_PACK_ONLY",
+    ):
+        if required_text not in root_readme:
+            raise SystemExit(f"README is missing phase-one status text: {required_text}")
+    mcmeta = json.loads((ROOT / "pack" / "pack.mcmeta").read_text())
+    description = mcmeta["pack"]["description"]
+    if "Source-complete RC" not in description or "runtime verification pending" not in description:
+        raise SystemExit("pack.mcmeta does not describe the source-complete/runtime-pending state")
+
     print(f"phase-one source audit: PASS ({len(systems)} systems, {len(slots)} VMD bake slots)")
     print("runtime acceptance: PENDING (must be performed in Minecraft)")
 
