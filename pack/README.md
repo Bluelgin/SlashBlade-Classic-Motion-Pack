@@ -1,75 +1,112 @@
 # SlashBlade Classic Motion Pack
 
-Restore the classic SlashBlade 1.12.2 motion style on SlashBlade: Resharped for Minecraft 1.20.1.
+Restore the classic SlashBlade 1.12.2/r32 motion language on SlashBlade: Resharped for Minecraft 1.20.1.
 
-**v0.1.0 experimental candidate — Runtime verification pending.** This is a resource pack, not a mod. It contains a source-derived classic blade/saya animation bake, a vanilla player-pose adapter, and generated classic-style attack-effect adapters. It does **not** contain recovered 1.12.2 skeletal animations: that version implements its blade motions procedurally in Java and has no VMD files.
+**v0.1.0 source-complete release candidate — Minecraft runtime verification pending.** Phase-one resource implementation is complete for the pinned target: every known visual subsystem is either implemented through ordinary resource-pack assets or classified from source as a hard `IMPOSSIBLE_RESOURCE_PACK_ONLY` / target-owned boundary. This is still **not** a verified stable release until the in-game acceptance checklist is run.
+
+This is a resource pack, not a mod. It contains a source-derived classic blade/saya animation bake, a resource-only player-pose passthrough adapter and generated classic-style attack-effect adapters. It does **not** claim a recovered 1.12.2 skeletal animation atlas; official r32 implements its blade motions procedurally in Java and ships no full-body VMD/PMD animation set.
 
 ## Requirements
 
 - Minecraft 1.20.1
 - SlashBlade: Resharped and its normal dependencies, including its player-animation support
-- Target inspected: Resharped **1.9.65**, master commit `6e2a0a092fb794d7ea56fd83452869674f3ab1c7`
+- Inspected target: Resharped **1.9.65**, commit `6e2a0a092fb794d7ea56fd83452869674f3ab1c7`
 
-**No additional mod required.** No Java classes, scripts, datapacks or executable code ship in the ZIP.
+**No additional project-specific mod required.** No Java classes, Mixins, scripts, datapacks or executable code ship in the ZIP.
 
 ## Installation
 
-1. Download `SlashBlade-Classic-Motion-Pack-1.20.1-v0.1.0.zip` from the PR/Actions build artifact (there is no verified stable Release yet).
+1. Get `SlashBlade-Classic-Motion-Pack-1.20.1-v0.1.0.zip` from the latest successful Actions artifact.
 2. Put the ZIP into `.minecraft/resourcepacks/` without extracting it.
-3. Enable it above other packs that override SlashBlade animations/effects.
-4. Restart the Minecraft client, enter a world and use SlashBlade.
+3. Enable it above other packs that override SlashBlade animation/effect resources.
+4. Restart Minecraft, then enter a world and use SlashBlade.
 
-The restart is necessary for a reliable test: Resharped caches the player PMD in a static lazy value. Enabling this pack after the model has loaded does not recreate that value. Restart after disabling it too. An enable-only hot swap has **not** been established.
+Restart is required for a reliable test because Resharped caches the player PMD in a static lazy value. Restart after disabling the pack too; a live enable/disable cycle is not a valid comparison.
 
-## Animation and effect status
+## Phase-one status
 
-| Area | This build |
+| Area | Result |
 |---|---|
-| A1, A2 | Legacy Saya1/Saya2 blade + sheath curves baked into 1–41 and 100–151; recovery adapted |
-| A3–A5, A4 EX | Coherent classic S-rank motion language: SIai → SSlashEdge → SReturnEdge → SSlashBlade, fitted to modern shared/branching slots; approximate semantics |
-| Air, Upper, Rapid, Rising, Judgement | Source-derived legacy visual candidates; runtime unverified |
-| Void Slash | Dedicated modern **Classic Interpretation**: SlashDim-like attack stage + classic Noutou gesture in Resharped's separate sheath stage |
-| B, Circle, C, Sakura, shared Drive/Wave slots | Shared-slot **Classic Interpretation** compromises; one VMD region must serve every modern consumer |
-| Normal slash light / `EntitySlashEffect` | Global generated **Classic Trail Adapter** replaces modern `slash.obj/png` with a narrow tapered afterimage. This covers every `AttackManager.doSlash(...)` effect and Void Slash without per-combo Java changes |
-| Drive projectile visual | r32's procedural 14-point Drive prism is baked into Resharped's fixed `drive.obj` transform; generated neutral `ss.png` keeps modern blade color tinting |
-| Judgement Cut visual | Resharped already ships the exact r32 `slashdim.obj/png` Git blobs; the pack deliberately leaves them untouched instead of redistributing duplicate art |
-| Player body | Modern custom full-body poses bypassed by a generated PMD adapter; underlying **1.20.1 vanilla poses** retained, not an exact 1.12.2 body restoration |
-| First-person attack motion | The same classic VMD blade/saya motion is visible through Resharped's blade layer; runtime clipping/alignment still needs in-game acceptance |
-| First-person idle/hold camera transform | **`IMPOSSIBLE_RESOURCE_PACK_ONLY` on the pinned target.** Resharped resets the incoming item-render pose to identity and applies its own hard-coded first-person transform, so item-model `firstperson_*` display JSON cannot restore r32's old hold position/angle |
-| Piercing | Upstream blade motion untouched; player pose adapter is global and also affects this move |
-| Gameplay | Resharped damage, movement, timing, branches and effect entities remain authoritative |
+| Ground A chain | A1/A2 are source-derived Saya1/Saya2 restorations; A3–A5/A4 EX use the coherent r32 S-rank motion language fitted into modern fixed slots |
+| Air / Upper / Rapid / Rising | Source-derived legacy move families baked into their modern windows; shared modern semantics are explicitly Classic Interpretation |
+| Judgement / Void | Judgement blade motion uses classic SlashDim language; Void uses a dedicated SlashDim-like attack + Noutou sheath interpretation |
+| B / C / Circle / Sakura / shared Drive-Wave slots | Explicit shared-slot Classic Interpretation; one VMD region must serve every modern caller |
+| Main-hand `NONE` / `STANDBY` | `SUPPORTED_VIA_MOTION_VMD`; frames 0..1 contain the retargeted r32 active-layer neutral pose |
+| Player body | Generated missing-bone PMD/VMD suppresses Resharped's custom skeletal SlashBlade pose and returns the incoming player transforms unchanged |
+| r32 vanilla swing-clock restart | `IMPOSSIBLE_RESOURCE_PACK_ONLY`; pose passthrough is not a claim that every accepted modern combo restarts the old vanilla arm swing exactly |
+| Normal slash light / `EntitySlashEffect` | Generated narrow classic trail adapter replaces modern `slash.obj/png` globally |
+| Drive projectile visual | Generated r32 procedural prism baked to Resharped's `drive.obj` contract; neutral `ss.png` preserves runtime tint |
+| Judgement Cut dimension art | Installed Resharped `slashdim.obj/png` Git blobs are already identical to r32; intentionally left untouched |
+| First-person attack motion | Same generated blade/saya VMD is rendered by `LayerMainBlade`; subject to runtime clipping/alignment acceptance |
+| First-person idle/hold wrapper | `IMPOSSIBLE_RESOURCE_PACK_ONLY`; Resharped resets the incoming pose and applies a hard-coded FPV matrix |
+| Back/offhand DEFAULT / PSO2 / NINJA carry | `IMPOSSIBLE_RESOURCE_PACK_ONLY`; modern `renderStandbyBlade()` owns these Java transforms |
+| Old dynamic blade afterimage loop / Projectile Barrier trail | `IMPOSSIBLE_RESOURCE_PACK_ONLY`; copy count, live progress/alpha/state branching are runtime renderer behavior |
+| Gameplay | Resharped damage, hitboxes, movement, cancel windows, invulnerability, targeting and combo-state logic remain authoritative |
 
-The ground classic chain begins with two **saya strikes**. The shared A3 slot then uses old `SIai`; on Resharped's powered continuation the visual sequence proceeds through `SSlashEdge → SReturnEdge → SSlashBlade`. A resource pack cannot select Battou versus SIai dynamically from old rank/current modern power state, so the regular A4 path is an explicit compromise. The source has no old A1–A5 VMD slots to copy.
+The ground classic chain starts with two **saya strikes**. The shared A3 region uses old `SIai`; the powered continuation can then read as `SSlashEdge → SReturnEdge → SSlashBlade`. Pure resource data cannot branch A3 between old Battou/SIai behavior based on historical rank/timing state, so shared modern branches are documented interpretations rather than mislabeled exact ports.
 
-The project distinguishes **Classic Restoration** from **Classic Interpretation**. Restoration samples a directly corresponding r32 move or procedural visual. Interpretation keeps a modern Resharped move/state but expresses it using r32 motion/effect language. Modern frame sharing is machine-checked so improving one move cannot silently overwrite another move that consumes the same VMD frames. See [modern Classic Interpretation policy](docs/mapping/modern-classic-interpretation.md), [classic attack-effect adaptation](docs/mapping/classic-effect-adaptation.md), [source provenance](docs/research/legacy-1.12.2-source.md), [semantic mapping](docs/mapping/legacy-to-resharped.md), [first-person renderer audit](docs/research/first-person-rendering.md), and [limitations](docs/limitations.md).
+See the machine-readable phase gate in [`data/phase_one_scope.json`](data/phase_one_scope.json) and the human summary in [`docs/phase-one-status.md`](docs/phase-one-status.md). CI runs `scripts/audit_phase_one.py` so new source work cannot silently reintroduce an unclassified phase-one subsystem.
 
-### First-person ceiling
+## Why the pack is built this way
 
-The old r32 view is not just an item-model transform. `BladeFirstPersonRender` applies its own Java matrix, has a separate Projectile Barrier branch, synchronizes pitch and controls first-person blur behavior. On the pinned Resharped target, the modern `BladeFirstPersonRender` resets the incoming `PoseStack` to identity before applying its own fixed matrix and invoking `LayerMainBlade`. Therefore the pack can classicize the **attack motion seen in first person**, but cannot independently replace the outer camera-relative idle/hold transform without runtime code. A global OBJ/PMD/VMD offset would also move the third-person blade and is rejected as a regression, not treated as a valid workaround.
+Official r32 has no VMD attack atlas to copy. Its visible blade/saya motion is generated in `LayerSlashBlade.java`. The pack therefore follows this path:
 
-### Resource-pack effect ceiling
+```text
+r32 procedural Java formulas
+        ↓ offline sampling
+blade + sheath transforms
+        ↓ retarget to Resharped hardpoints
+fixed modern frame windows
+        ↓
+combostate/motion.vmd
+        ↓
+normal Resource Pack ZIP
+```
 
-The pack can replace Resharped's hard-coded effect meshes/textures, but it cannot replace the Java entity renderer. For normal slash effects, Resharped still owns spawn timing, lifetime, `rotationOffset - 135° * progress`, scale/flattening, blade color and rank-dependent render passes. Drive and Judgement Cut likewise keep their modern entity timing/choreography. The new effect assets are therefore designed to remain visually coherent under those fixed transforms; they are not a claim that the old blade-attached `LayerSlashBlade` trail renderer is running on 1.20.1.
+The original source is authoritative. The independent modern project Old Dream Reforged is used only as a second matrix/procedural oracle where its legacy behavior overlaps; it is not a runtime dependency and no Java renderer from it ships here.
 
-## Comparison and verification
+## Player-body strategy
 
-The canonical motion source is the official SlashBlade 1.12.2/r32 branch. In addition, CI cross-checks the overlapping procedural move table and blade/saya transform math against the independent modern port [Old Dream Reforged](https://github.com/rianfalltwilight-lab/seac-slashblade-old-dream-reforged), pinned to a known commit. This is a validation oracle only: it is not a runtime dependency and its Java renderer is not shipped in the pack. See [Old Dream oracle research](docs/research/old-dream-reforged-oracle.md).
+r32 restarts Minecraft's normal swing clock and renders SlashBlade's weapon layer separately; it does not ship a recoverable full-body skeletal clip. Resharped, by contrast, starts a custom `VmdAnimation` on blade motions.
 
-The current evidence is source analysis, independent sampled matrix comparisons, decoded-VMD matrix reconstruction, generated-effect geometry/texture checks, format checks and deterministic builds. No automated in-game comparison is claimed. The bodies, weapon attachment, first-person attack visibility/clipping, early cancels, remote players and final effect alignment need the [runtime checklist](docs/testing-checklist.md). The r32 first-person idle/hold matrix itself is no longer an unresolved tuning item: it is a documented `IMPOSSIBLE_RESOURCE_PACK_ONLY` boundary on the pinned Resharped renderer. This is not a claim to restore the complete 1.12.2 combat system or every animation exactly.
+The generated `alex.pmd` and `player_motion.vmd` contain only an unknown `classic_root` bone. In the pinned Resharped `VmdAnimation`, missing player bones fall through to `return value0`, so normal player parts receive their incoming transforms rather than the modern custom SlashBlade skeletal pose. This is intentional passthrough architecture, not a placeholder.
 
-## Build (developers only)
+A resource pack cannot reproduce r32's Java `doSwingItem` state mutation for every accepted combo, change Resharped animation-layer priority, or remove every Java user-pose/root rotation. See [`docs/research/player-pose-adapter.md`](docs/research/player-pose-adapter.md).
 
-Python 3.10+; no third-party Python dependencies:
+## First-person and carry ceilings
+
+r32's old-style first-person view is Java-driven: it applies its own camera-relative matrix, has a separate Projectile Barrier branch and controls pitch/blur behavior. The pinned Resharped `BladeFirstPersonRender` resets its incoming `PoseStack` to identity before applying a fixed modern transform. Consequently a `models/item/slashblade.json` `firstperson_*` display override cannot restore the r32 hold view. The classic **attack VMD remains visible** inside that wrapper. See [`docs/research/first-person-rendering.md`](docs/research/first-person-rendering.md).
+
+Main-hand standby is different: Resharped `NONE` and `STANDBY` use frames 0..1 of `combostate/motion.vmd`, and those frames are already the retargeted r32 neutral weapon pose. Back/offhand carry goes through Java `renderStandbyBlade()` and cannot be independently replaced by this pack. See [`docs/research/standby-carry-rendering.md`](docs/research/standby-carry-rendering.md).
+
+## Effect ceiling
+
+The pack can replace fixed effect meshes/textures but not their Java entity renderers. For normal slash effects, Resharped still owns spawn timing, lifetime, progress rotation, size, rank passes and color. Drive and Judgement Cut likewise retain modern runtime choreography. Generated effect assets are therefore designed to read as classic under those fixed transforms; they are not a claim that r32's blade-attached trail/afterimage Java loop is executing on 1.20.1.
+
+Detailed mappings: [`docs/mapping/classic-effect-adaptation.md`](docs/mapping/classic-effect-adaptation.md), [`docs/mapping/legacy-to-resharped.md`](docs/mapping/legacy-to-resharped.md), and [`docs/mapping/modern-classic-interpretation.md`](docs/mapping/modern-classic-interpretation.md).
+
+## Runtime verification
+
+Source analysis, old-source extraction, independent oracle comparisons, decoded-VMD matrix reconstruction, frame coverage, effect-resource checks, format validation and deterministic builds are automated. They cannot judge feel, clipping or camera composition.
+
+Before a stable release, run [`docs/testing-checklist.md`](docs/testing-checklist.md): compare r32/control/candidate footage, test A1–A5 and all air/special families, earliest combo inputs, first person, crouch/walk/jump, custom blade models, generated effects and remote players. Hard resource-pack ceilings documented above are not runtime bugs to “fix” with a global model offset.
+
+## Build
+
+Python 3.10+; no third-party Python packages:
 
 ```sh
 python scripts/verify_old_dream_oracle.py
+python scripts/audit_phase_one.py
 python -m unittest discover -s tests -v
 python scripts/build_pack.py
 python scripts/validate_pack.py dist/SlashBlade-Classic-Motion-Pack-1.20.1-v0.1.0.zip
 ```
 
-The build regenerates all shipped VMD/PMD and classic effect resources, writes an original geometric icon, validates the pack and creates a deterministic ZIP with `pack.mcmeta` at its root. Players do not run these tools. [Development details](docs/development.md).
+The build regenerates all shipped VMD/PMD/effect resources, writes the original project icon, validates the pack and creates a deterministic ZIP with `pack.mcmeta` at its root. Development details: [`docs/development.md`](docs/development.md).
 
 ## Credits and license
 
-Classic procedural motion/effect reference: Furia / flammpfeil, SlashBlade `mc1.12-r32`, official `1.12.2` branch. Modern resource contracts: MMF-Group / 0999312, SlashBlade: Resharped. Independent validation reference: Old Dream Reforged, pinned and credited in `THIRD_PARTY_NOTICES.md`. The codec, packaging, generated classic trail art, generated neutral Drive texture and original metadata use this repository's MIT license. The legacy-derived motion and procedural Drive geometry retain their separately documented provenance and custom upstream terms; they are **not** relabeled MIT. No modern upstream VMD, PMD, texture or model binary is redistributed. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+Classic procedural reference: Furia / flammpfeil, SlashBlade `mc1.12-r32`, official `1.12.2` branch. Modern resource contracts: MMF-Group / 0999312, SlashBlade: Resharped. Independent validation reference: Old Dream Reforged.
+
+Project tooling, metadata and newly generated project art use this repository's MIT license. Legacy-derived motion/procedural geometry retain their documented upstream provenance/terms and are **not** relabeled MIT. No modern upstream VMD, PMD, texture or model binary is redistributed. See [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md).
