@@ -15,6 +15,8 @@ GAME_TPS=20
 VANILLA_SWING_FRAMES=9
 DIRECT_NONE_MOVES={'SlashDim','Iai','SIai','Noutou'}
 ADAPTATION_CLASSES={'CLASSIC_RESTORATION','CLASSIC_INTERPRETATION'}
+PIERCING_ACTIVE_FRAME=33
+PIERCING_MAX_FRAME=90
 
 def mix(a,b,t):
     return tuple(x+(y-x)*t for x,y in zip(a[0],b[0])),slerp(a[1],b[1],t)
@@ -71,6 +73,41 @@ def passthrough_pmd():
     b+=struct.pack('<HHBBIB',0,0,0,0,0,0)  # IK, morphs, displays, English flag
     b+=bytes(1000)+struct.pack('<II',0,0)  # toon names, rigid bodies, joints
     return b
+
+def classic_piercing_motions(combos):
+    """Build the dedicated modern Piercing atlas as a classic interpretation.
+
+    Resharped uses an isolated 1..90 VMD for Piercing. Frames 1..32 are its
+    preparation/hold state. At frame 33 the Java combo begins the actual forward
+    lunge and area hit. r32's Stinger is the closest classic semantic match and
+    intentionally evaluates at full thrust progress; its 20-tick reset clock is
+    preserved on the 30 Hz atlas, so recovery begins at frame 63. Non-saya r32
+    moves then enter a fresh Noutou swing before returning to None.
+
+    The matching player VMD is a passthrough track so Resharped's modern full-body
+    Piercing clip does not fight the classic blade path. Movement/hit timing stays
+    entirely in modern Java.
+    """
+    recovery=PIERCING_ACTIVE_FRAME+legacy_reset_frames(combos['Stinger'])
+    blade=[]
+    for f in range(PIERCING_MAX_FRAME+1):
+        for bone,sheath in [('hardpointA',False),('hardpointB',True)]:
+            idle=pose(combos['None'],0,sheath)
+            if f<PIERCING_ACTIVE_FRAME:
+                result=idle
+            elif f<recovery:
+                result=pose(combos['Stinger'],1,sheath)
+            else:
+                t=(f-recovery)/VANILLA_SWING_FRAMES
+                result=pose(combos['Noutou'],min(1,t),sheath) if t<1 else idle
+            blade.append(Key(bone,f,*result))
+    for bone in ('センター','JointA1','JointA2','JointA3','JointB1','JointB2','JointB3'):
+        for f in (0,PIERCING_MAX_FRAME):
+            blade.append(Key(bone,f))
+    player=[Key('classic_root',f) for f in range(PIERCING_MAX_FRAME+1)]
+    # VMD model-name field is 20 bytes (CP932). Keep these deliberately short.
+    return (Motion('Classic Stinger',blade),
+            Motion('Classic Piercing',player),recovery)
 
 def generate(output):
     legacy=json.loads((ROOT/'data/legacy_motion_map.json').read_text())
@@ -152,6 +189,13 @@ def generate(output):
     player=Motion('Classic passthrough',[Key('classic_root',f) for f in range(max_frame+1)])
     (dest/'model/pa/player_motion.vmd').write_bytes(player.encode())
     (dest/'model/pa/alex.pmd').write_bytes(passthrough_pmd())
+
+    piercing,piercing_player,piercing_recovery=classic_piercing_motions(combos)
+    (dest/'combostate/piercing.vmd').write_bytes(piercing.encode())
+    (dest/'combostate/piercing_pl.vmd').write_bytes(piercing_player.encode())
+    report.append(dict(slot='Piercing dedicated atlas',legacy='Stinger',adaptation='CLASSIC_INTERPRETATION',
+                       frames=[1,PIERCING_MAX_FRAME],recovery=piercing_recovery,
+                       timeout_target='noutou',status='APPROXIMATE'))
     return report
 
 if __name__=='__main__':
