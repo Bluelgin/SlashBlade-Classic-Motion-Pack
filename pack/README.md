@@ -26,20 +26,20 @@ The restart is necessary for a reliable test: Resharped caches the player PMD in
 | Area | This build |
 |---|---|
 | A1, A2 | Legacy Saya1/Saya2 blade + sheath curves baked into 1–41 and 100–151; recovery adapted |
-| A3–A5, A4 EX | Legacy Battou / SSlashEdge / SReturnEdge / SSlashBlade mapped to modern slots; approximate semantics |
+| A3–A5, A4 EX | Coherent classic S-rank motion language: SIai → SSlashEdge → SReturnEdge → SSlashBlade, fitted to modern shared/branching slots; approximate semantics |
 | Air, Upper, Rapid, Rising, Judgement | Source-derived legacy visual candidates; runtime unverified |
 | B, Circle, C, Void, Sakura, shared Drive/Wave slots | Explicit approximations and shared-slot compromises |
 | Player body | Modern custom full-body poses bypassed by a generated PMD adapter; underlying **1.20.1 vanilla poses** retained, not an exact 1.12.2 body restoration |
 | Piercing | Upstream blade motion untouched; player pose adapter is global and also affects this move |
 | Gameplay | Resharped damage, movement, timing, branches and effects remain authoritative |
 
-The ground classic chain begins with two **saya strikes**, followed by a draw. The source has no old A1–A5 VMD slots to copy. See [source provenance](docs/research/legacy-1.12.2-source.md), [semantic mapping](docs/mapping/legacy-to-resharped.md), and [limitations](docs/limitations.md).
+The ground classic chain begins with two **saya strikes**. The shared A3 slot then uses old `SIai`; on Resharped's powered continuation the visual sequence proceeds through `SSlashEdge → SReturnEdge → SSlashBlade`. A resource pack cannot select Battou versus SIai dynamically from old rank/current modern power state, so the regular A4 path is an explicit compromise. The source has no old A1–A5 VMD slots to copy. See [source provenance](docs/research/legacy-1.12.2-source.md), [semantic mapping](docs/mapping/legacy-to-resharped.md), and [limitations](docs/limitations.md).
 
 ## Comparison and verification
 
 The canonical motion source is the official SlashBlade 1.12.2/r32 branch. In addition, CI cross-checks the overlapping procedural move table and blade/saya transform math against the independent modern port [Old Dream Reforged](https://github.com/rianfalltwilight-lab/seac-slashblade-old-dream-reforged), pinned to a known commit. This is a validation oracle only: it is not a runtime dependency and its Java renderer is not shipped in the pack. See [Old Dream oracle research](docs/research/old-dream-reforged-oracle.md).
 
-The current evidence is source analysis, independent sampled matrix comparisons, format checks and deterministic builds. No in-game comparison footage or GUI test is claimed. The bodies, weapon attachment, first-person view, early cancels and remote players need the [runtime checklist](docs/testing-checklist.md). This is not a claim to restore the complete 1.12.2 combat system or every animation exactly.
+The current evidence is source analysis, independent sampled matrix comparisons, decoded-VMD matrix reconstruction, format checks and deterministic builds. No in-game comparison footage or GUI test is claimed. The bodies, weapon attachment, first-person view, early cancels and remote players need the [runtime checklist](docs/testing-checklist.md). This is not a claim to restore the complete 1.12.2 combat system or every animation exactly.
 
 ## Build (developers only)
 

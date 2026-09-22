@@ -63,14 +63,32 @@ class RetargetTests(unittest.TestCase):
         self.assertEqual(pose(a,.5,True),pose(a,.5,False))
         self.assertEqual(pose(a,1),pose(b,0))
         self.assertEqual(pose(b,1),pose(self.combos['None'],0))
-    def test_a3_battou_recovery_starts_at_classic_timeout_boundary(self):
+    def test_ground_chain_uses_coherent_s_rank_sequence(self):
+        slots=json.loads((ROOT/'data/bake_slots.json').read_text())['slots']
+        by_name={x['name']:x for x in slots}
+        self.assertEqual(by_name['A1']['legacy'],'Saya1')
+        self.assertEqual(by_name['A2']['legacy'],'Saya2')
+        self.assertEqual(by_name['A3 / Sakura right']['legacy'],'SIai')
+        self.assertEqual(by_name['A4']['legacy'],'SSlashEdge')
+        self.assertEqual(by_name['A4 EX']['legacy'],'SSlashEdge')
+        self.assertEqual(by_name['A4 EX']['second_legacy'],'SReturnEdge')
+        self.assertEqual(by_name['A5']['legacy'],'SSlashBlade')
+
+        # SIai is the old quick draw-and-return curve. Unlike Battou's one-way
+        # ease, it reaches the far pose and comes back during one vanilla swing,
+        # which fits Resharped A3's two timeline hits much better.
+        self.assertAlmostEqual(progress(0,'SIai'),0)
+        self.assertAlmostEqual(progress(5/12,'SIai'),1)
+        self.assertAlmostEqual(progress(5/6,'SIai'),0)
+
+    def test_a3_siai_recovery_starts_at_classic_timeout_boundary(self):
         slots=json.loads((ROOT/'data/bake_slots.json').read_text())['slots']
         a3=next(x for x in slots if x['name']=='A3 / Sakura right')
-        battou=self.combos['Battou']
+        siai=self.combos['SIai']
         # comboResetTicks is a state-reset/timeout window, not the duration of
-        # the visible swing. At 30 VMD frames / 20 game ticks, r32 Battou's
+        # the visible swing. At 30 VMD frames / 20 game ticks, r32 SIai's
         # 12-tick reset lands 18 frames after modern slot start: 200 -> 218.
-        expected=a3['start']+round(battou['reset_ticks']*30/20)
+        expected=a3['start']+round(siai['reset_ticks']*30/20)
         self.assertEqual(expected,218)
         self.assertEqual(a3['recovery_start'],expected)
 
