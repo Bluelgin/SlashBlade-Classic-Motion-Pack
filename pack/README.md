@@ -26,14 +26,15 @@ The restart is necessary for a reliable test: Resharped caches the player PMD in
 | Area | This build |
 |---|---|
 | A1, A2 | Legacy Saya1/Saya2 blade + sheath curves baked into 1–41 and 100–151; recovery adapted |
-| A3–A5, A4 EX | Legacy Battou / SSlashEdge / SReturnEdge / SSlashBlade mapped to modern slots; approximate semantics |
+| Ground draw branches | Quick A2 route uses legacy SIai and continues into SSlashEdge-family motion; delayed A2 route uses legacy Battou; modern rank/branch logic still applies |
+| A4/A4 EX/A5 | Legacy SSlashEdge / SReturnEdge / SSlashBlade candidates mapped into modern continuation slots; approximate semantics |
 | Air, Upper, Rapid, Rising, Judgement | Source-derived legacy visual candidates; runtime unverified |
 | B, Circle, C, Void, Sakura, shared Drive/Wave slots | Explicit approximations and shared-slot compromises |
 | Player body | Modern custom full-body poses bypassed by a generated PMD adapter; underlying **1.20.1 vanilla poses** retained, not an exact 1.12.2 body restoration |
-| Piercing | Upstream blade motion untouched; player pose adapter is global and also affects this move |
+| Piercing | Upstream blade asset unchanged; player pose adapter is global and also affects this move |
 | Gameplay | Resharped damage, movement, timing, branches and effects remain authoritative |
 
-The ground classic chain begins with two **saya strikes**, followed by a draw. The source has no old A1–A5 VMD slots to copy. See [source provenance](docs/research/legacy-1.12.2-source.md), [semantic mapping](docs/mapping/legacy-to-resharped.md), and [limitations](docs/limitations.md).
+The ground classic chain begins with two **saya strikes**. The fast continuation is mapped toward the old `SIai → SSlashEdge → SReturnEdge → SSlashBlade` language, while the delayed A2 branch uses `Battou`. The source has no old A1–A5 VMD slots to copy. See [source provenance](docs/research/legacy-1.12.2-source.md), [semantic mapping](docs/mapping/legacy-to-resharped.md), and [limitations](docs/limitations.md).
 
 ## Comparison and verification
 
