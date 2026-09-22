@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "phase": "resource-pack-only classic motion restoration",
+  "target": {
+    "minecraft": "1.20.1",
+    "slashblade_resharped": "1.9.65",
+    "commit": "6e2a0a092fb794d7ea56fd83452869674f3ab1c7"
+  },
+  "legacy": {
+    "slashblade": "mc1.12-r32",
+    "commit": "ba1ef8604c0971f68336b882b42a868df7f32f0b"
+  },
+  "definition": {
+    "source_complete": "Every phase-one visual subsystem has either an implemented resource-pack path or a source-proven IMPOSSIBLE_RESOURCE_PACK_ONLY / target-owned classification. No known resource-pack implementation task remains intentionally unimplemented.",
+    "runtime_complete": "All player-facing visual acceptance checks have been run in Minecraft 1.20.1 and passed. This project is NOT runtime-complete yet."
+  },
+  "source_complete": true,
+  "runtime_complete": false,
+  "systems": [
+    {"id":"ground_combo_blade_saya","status":"IMPLEMENTED","mechanism":"generated combostate/motion.vmd","evidence":"bake_slots + legacy source/oracle parity"},
+    {"id":"air_combo_blade_saya","status":"IMPLEMENTED_WITH_CLASSIC_INTERPRETATION","mechanism":"generated combostate/motion.vmd","evidence":"fixed modern slots + r32 move-family mapping"},
+    {"id":"special_move_blade_saya","status":"IMPLEMENTED_WITH_CLASSIC_INTERPRETATION","mechanism":"generated combostate/motion.vmd","evidence":"Judgement/Void/Rapid/Rising/Upper/Drive/Wave slot policy"},
+    {"id":"main_hand_none_standby","status":"IMPLEMENTED","mechanism":"frames 0..1 of generated combostate/motion.vmd","evidence":"standby_carry_contract"},
+    {"id":"player_body_override_removal","status":"IMPLEMENTED_RESOURCE_PASSTHROUGH","mechanism":"generated bone-only alex.pmd + classic_root-only player_motion.vmd","evidence":"target VmdAnimation missing-bone return_value0 contract"},
+    {"id":"r32_vanilla_swing_clock_restart","status":"IMPOSSIBLE_RESOURCE_PACK_ONLY","mechanism":"legacy runtime doSwingItem behavior","evidence":"requires changing player swing runtime state; Old Dream reproduces it with Java event handling"},
+    {"id":"normal_slash_trail","status":"IMPLEMENTED_WITH_CLASSIC_INTERPRETATION","mechanism":"generated slash.obj + slash.png","evidence":"effect_resource_contract"},
+    {"id":"legacy_blade_afterimage_copy_count","status":"IMPOSSIBLE_RESOURCE_PACK_ONLY","mechanism":"legacy runtime renderer loop","evidence":"copy count/progress/alpha are Java-owned"},
+    {"id":"drive_projectile_visual","status":"IMPLEMENTED","mechanism":"generated drive.obj + neutral ss.png","evidence":"r32 procedural prism baked to modern resource contract"},
+    {"id":"judgement_cut_dimension_asset","status":"UPSTREAM_ALREADY_CLASSIC","mechanism":"leave installed slashdim.obj/png untouched","evidence":"modern and r32 Git blobs are identical"},
+    {"id":"first_person_attack_motion","status":"IMPLEMENTED","mechanism":"shared generated blade/saya VMD rendered by LayerMainBlade","evidence":"first_person_render_contract"},
+    {"id":"first_person_idle_hold_wrapper","status":"IMPOSSIBLE_RESOURCE_PACK_ONLY","mechanism":"Resharped BladeFirstPersonRender hard-coded PoseStack reset/matrix","evidence":"first_person_render_contract"},
+    {"id":"first_person_projectile_barrier_branch","status":"IMPOSSIBLE_RESOURCE_PACK_ONLY","mechanism":"legacy runtime branch","evidence":"first_person_render_contract"},
+    {"id":"back_offhand_carry_default_pso2_ninja","status":"IMPOSSIBLE_RESOURCE_PACK_ONLY","mechanism":"Resharped renderStandbyBlade hard-coded Java transforms","evidence":"standby_carry_contract"},
+    {"id":"runtime_combo_branch_selection","status":"IMPOSSIBLE_RESOURCE_PACK_ONLY","mechanism":"Java ComboState/rank/timing logic","evidence":"modern_classic_policy"},
+    {"id":"damage_hitbox_velocity_cancel_invulnerability","status":"OUT_OF_SCOPE_RUNTIME_GAMEPLAY","mechanism":"Resharped gameplay remains authoritative","evidence":"resource pack has no gameplay code"},
+    {"id":"legacy_dynamic_projectile_barrier_trail","status":"IMPOSSIBLE_RESOURCE_PACK_ONLY","mechanism":"runtime renderer/state","evidence":"modern_classic_policy + legacy LayerSlashBlade"},
+    {"id":"exact_global_legacy_model_scale_for_all_custom_blades","status":"IMPOSSIBLE_RESOURCE_PACK_ONLY","mechanism":"VMD has position/rotation but no safe per-context universal model-scale override","evidence":"modern/legacy renderer scale difference; global geometry edits would break arbitrary custom blades"},
+    {"id":"resource_pack_zip","status":"IMPLEMENTED","mechanism":"deterministic build + strict validator + CI artifact","evidence":"build_pack.py / validate_pack.py / GitHub Actions"}
+  ],
+  "allowed_terminal_statuses": [
+    "IMPLEMENTED",
+    "IMPLEMENTED_WITH_CLASSIC_INTERPRETATION",
+    "IMPLEMENTED_RESOURCE_PASSTHROUGH",
+    "UPSTREAM_ALREADY_CLASSIC",
+    "IMPOSSIBLE_RESOURCE_PACK_ONLY",
+    "OUT_OF_SCOPE_RUNTIME_GAMEPLAY"
+  ],
+  "remaining_gate": "Minecraft runtime acceptance only: visual alignment, clipping/camera safety, transition feel, custom blade sampling, multiplayer observation and effect timing."
+}
