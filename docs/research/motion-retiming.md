@@ -2,25 +2,38 @@
 
 There is no old VMD range X–Y to shift. The input is r32's procedural swing function. The offline sampler evaluates it in a normalized legacy swing domain and writes poses into the extracted modern frame windows.
 
-1. Ordinary attack movement uses the conventional six-tick / nine-frame swing baseline. The renderer multiplies normalized progress by 1.2, then applies its original quadratic ease-out. Do not mistake comboResetTicks for swing length.
-2. Preserve the slash duration; hold the terminal pose for longer modern follow-through windows. Do not linearly stretch every attack to consume 100+ frames.
-3. Recovery begins at source-extracted state/sheath boundaries when a compatible boundary exists. Saya recovery uses a quaternion/translation bridge to neutral; drawn-blade recovery bridges to sampled old Noutou. These connections are explicitly **approximations**. Short aerial recovery windows compress the bridge/recovery, not the main slash.
-4. Dense per-frame poses avoid relying on Bezier support that modern NyMmd does not implement. Quaternions remain unit length; all source matrix multiplication order and translations are retained.
-5. Shared windows are authored once. It is impossible to give B2/B3 distinct poses at the same resource/frame/bone address. No duplicate keys or nondeterministic merge precedence is permitted in the generic remapper.
+1. Ordinary attack movement uses the conventional six-tick / nine-frame swing baseline. The renderer multiplies normalized progress by 1.2, then applies its original quadratic ease-out. Do not mistake `comboResetTicks` for visible swing length.
+2. Preserve the slash duration; long modern windows hold the relevant terminal/source pose rather than stretching a six-tick slash over 100+ VMD frames.
+3. Source-timed recovery follows the pinned r32 `ItemSlashBlade.onUpdate` target, not a generic blend. `Saya1`/`Saya2` and `SlashDim`/`Iai`/`SIai` reset directly to `None`. Other mapped non-saya moves enter `Noutou`, restart the vanilla swing, reach Noutou's final pose after nine VMD frames, hold it for the remainder of the delayed source state, then return to `None`.
+4. r32's default transition into `Noutou` stores `LastActionTime = currentTime + 5`. Noutou itself has `comboResetTicks = 5`, so the source-side state lifetime represented by this bake is ten game ticks / fifteen VMD frames after entry. This is separate from the six-tick swing duration.
+5. Dense per-frame poses avoid relying on Bezier support that modern NyMmd does not implement. Quaternions remain unit length; all source matrix multiplication order and translations are retained.
+6. Shared windows are authored once. It is impossible to give two modern consumers different poses at the same resource/frame/bone address. No duplicate keys or nondeterministic merge precedence is permitted.
 
-## A3 / Sakura-right Battou boundary
+## A3 / Sakura-right shared boundary
 
-The first PoC held the classic `Battou` terminal pose until frame 281 because that is where Resharped enters its final A3/Sakura recovery segment. That was internally valid but too late for the old state cadence.
+The earliest PoC used classic `Battou` in the shared A3 window and held that pose too long. Later source review showed that the powered classic route is better represented by the r32 S-rank language:
 
-Official r32 gives `Battou` a `comboResetTicks` value of 12. This is **not** the visible swing duration: the actual weapon swing still uses the short vanilla-swing-derived curve described above. It is, however, the old combo-state timeout after which a drawn move falls into `Noutou`. At the VMD playback rate used here, 12 game ticks correspond to 18 VMD frames. Starting from frame 200 gives frame **218**.
+`Saya1 → Saya2 → SIai → SSlashEdge → SReturnEdge → SSlashBlade`
 
-That value is not an arbitrary retime. In pinned Resharped 1.9.65, frame 218 is simultaneously:
+The current shared A3 region therefore uses **`SIai`**, not Battou. SIai has `comboResetTicks = 12`; at 30 VMD fps / 20 game tps that is 18 frames. Starting from frame 200 lands at frame **218**.
 
-- the end of `combo_a3` and start of `combo_a3_end`;
-- the end of `sakura_end_right` and start of `sakura_end_finish`.
+That frame is also a real pinned Resharped boundary:
 
-The shared 200–314 atlas region therefore now holds the short classic Battou swing, keeps its terminal pose through the remainder of the old 12-tick window, and begins the Noutou-style recovery at frame 218. This also avoids inventing a different transition for Sakura End Right, which consumes the same resource/frame addresses.
+- `combo_a3` ends and `combo_a3_end` begins at 218;
+- `sakura_end_right` ends and `sakura_end_finish` begins at 218.
 
-This build preserves the blade motion formula, not exact hit-synchronized timing across modern mechanics. A4 and A5 hold the source start pose for 8 and 18 frames respectively, placing the slash near the Java impact callbacks; powered A4 uses two source motions. This is adapted anticipation, not recovered old timing. Judgement's five-frame slash slot is an explicit exception to the nine-frame swing. Early combo cancellation and B repeats can jump between poses. These are release-blocking runtime review points, not claimed successes. Timing markers must be compared with recordings before promoting this candidate.
+Because SIai belongs to r32's direct-to-`None` timeout family, frame 218 becomes neutral. It does **not** enter Noutou. This is especially important because the same VMD addresses also serve Sakura End Right; the pack cannot make that shared region branch dynamically by old Stylish Rank or modern powered state.
+
+## Delayed and compound mappings
+
+Some modern states need an explicit source-clock origin that is not the start of the whole atlas slot.
+
+- A4 EX contains `SSlashEdge` followed by `SReturnEdge`; the final SReturnEdge segment owns the timeout clock.
+- Cleave/Sakura-left contains an embedded `Kiriorosi`; that final segment owns the timeout clock.
+- Judgement Cut places `SlashDim` at frame 1923, where Resharped enters its slash state, rather than at the start of the preparation state.
+- Void Slash is more extreme: Resharped does not call `doVoidSlashAttack` until elapsed tick 16. At 30 VMD fps / 20 game tps the classic SlashDim gesture therefore begins at frame **2224**, not 2200, and its eight-tick r32 reset lands at 2236. The later modern sheath state starts a separate Noutou interpretation at 2278.
+- Aerial A1 and Upper jump have modern windows shorter than their corresponding old reset clocks. They are deliberately left as explicit approximations instead of pretending a clamped source timeout is exact.
+
+This build preserves source motion formulas and source timeout semantics where the modern atlas allows it; it does not claim exact hit synchronization across every modern mechanic. A4/A5 anticipation offsets, powered branching, early combo cancellation, B repeats and short aerial windows remain runtime review points.
 
 The generic `python -m tools.vmd remap` supports offset and collision-free linear frame scaling while retaining pose and interpolation bytes. It refuses implicit boundary cuts and nonbone tracks to avoid silently corrupting animation. Future authored clip retiming can add piecewise markers with verified Bezier subdivision; it is not falsely claimed implemented here.
