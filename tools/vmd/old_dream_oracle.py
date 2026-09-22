@@ -11,7 +11,7 @@ Reference:
 Old Dream Reforged is MIT-licensed code. See THIRD_PARTY_NOTICES.md.
 No code in this module is required by the shipped resource pack.
 """
-from .transforms import chain, identity, translation as T, rotate as R, scale as S
+from .transforms import chain, identity, quaternion, translation as T, rotate as R, scale as S
 
 SOURCE_REPO = "rianfalltwilight-lab/seac-slashblade-old-dream-reforged"
 SOURCE_COMMIT = "a6b8cf5e3b5b3f270212a47b8d373a95f6a31af3"
@@ -178,3 +178,38 @@ def runtime_matrix(r32_name, t, sheath=False):
         S(0.095),
         R("z", -90),
     )
+
+
+def normalized_motion_matrix(r32_name, t, sheath=False):
+    """Old Dream motion normalized for Resharped's fixed installed model scale.
+
+    Old SlashBlade applied a 0.075 outer scale and a 0.095 model-local scale.
+    Resharped's VMD hardpoints cannot carry scale, so the baker preserves the
+    modern model scale and retargets only position/rotation. This removes the
+    old outer scale after applying the procedural transform, matching the
+    normalization used by the resource-pack baker without borrowing its math.
+    """
+    return chain(
+        T(0.25, 0.4, -0.5),
+        S(0.075),
+        R("x", 60),
+        R("z", -20),
+        R("y", 90),
+        dynamic(r32_name, t, sheath),
+        S(1.0 / 0.075),
+        R("z", -90),
+    )
+
+
+def retarget_pose(r32_name, t, sheath=False):
+    """Independent oracle pose in Resharped hardpoint coordinates."""
+    m = chain(
+        S(-1, 1, 1),
+        R("z", -180),
+        S(8),
+        T(0, -1.5, 0),
+        normalized_motion_matrix(r32_name, t, sheath),
+        S(0.125),
+        S(-1, 1, 1),
+    )
+    return tuple(m[i][3] for i in range(3)), quaternion(m)
