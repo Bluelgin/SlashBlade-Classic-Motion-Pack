@@ -9,6 +9,7 @@ from scripts.generate_motions import (
     VANILLA_SWING_FRAMES,
     generate,
     legacy_reset_frames,
+    noutou_state_frames,
 )
 from tools.vmd.codec import decode
 from tools.vmd.legacy import pose
@@ -48,18 +49,20 @@ class PiercingClassicInterpretationTests(unittest.TestCase):
         recovery = PIERCING_ACTIVE_FRAME + legacy_reset_frames(self.combos['Stinger'])
         self.assertEqual(recovery, 63)
         self.assertEqual(self.policy['legacy_reference']['recovery_frame'], recovery)
+        self.assertEqual(noutou_state_frames(self.combos), 15)
         self.assertEqual(
             self.policy['legacy_reference']['neutral_frame'],
-            recovery + VANILLA_SWING_FRAMES,
+            recovery + noutou_state_frames(self.combos),
         )
 
-    def test_generated_piercing_is_neutral_then_stinger_then_noutou(self):
+    def test_generated_piercing_is_neutral_then_stinger_then_delayed_noutou(self):
         with tempfile.TemporaryDirectory() as tmp:
             output = Path(tmp)
             report = generate(output)
             motion = decode((output / 'assets/slashblade/combostate/piercing.vmd').read_bytes())
             keys = {(key.bone, key.frame): key for key in motion.keys}
             recovery = PIERCING_ACTIVE_FRAME + legacy_reset_frames(self.combos['Stinger'])
+            neutral = recovery + noutou_state_frames(self.combos)
 
             for bone, sheath in (('hardpointA', False), ('hardpointB', True)):
                 self.assert_key_pose(
@@ -84,6 +87,16 @@ class PiercingClassicInterpretationTests(unittest.TestCase):
                 )
                 self.assert_key_pose(
                     keys[(bone, recovery + VANILLA_SWING_FRAMES)],
+                    pose(self.combos['Noutou'], 1, sheath),
+                    f'{bone} Noutou final swing pose',
+                )
+                self.assert_key_pose(
+                    keys[(bone, neutral - 1)],
+                    pose(self.combos['Noutou'], 1, sheath),
+                    f'{bone} Noutou hold',
+                )
+                self.assert_key_pose(
+                    keys[(bone, neutral)],
                     pose(self.combos['None'], 0, sheath),
                     f'{bone} neutral finish',
                 )
@@ -94,6 +107,7 @@ class PiercingClassicInterpretationTests(unittest.TestCase):
             self.assertEqual(reported['Piercing dedicated atlas']['legacy'], 'Stinger')
             self.assertEqual(reported['Piercing dedicated atlas']['recovery'], recovery)
             self.assertEqual(reported['Piercing dedicated atlas']['timeout_target'], 'noutou')
+            self.assertEqual(reported['Piercing dedicated atlas']['neutral'], neutral)
 
     def test_piercing_player_vmd_is_full_passthrough(self):
         with tempfile.TemporaryDirectory() as tmp:
