@@ -26,8 +26,12 @@ The CI gate verifies:
 1. Overlapping move metadata matches: scabbard use, amplitude, direction and enum reset ticks.
 2. The swing-progress function agrees at boundary, interior and out-of-range samples.
 3. Blade and sheath dynamic matrices agree across multiple time samples.
+4. The generator writes the expected hardpoint position/quaternion into the **actual encoded `motion.vmd` binary** for simple single-move slots.
+5. Those decoded VMD hardpoint records are passed back through Resharped's blade-layer transform chain and the reconstructed matrix is compared with the pinned Old Dream procedural reference.
 
-The comparison intentionally excludes final model scale. VMD bone records cannot encode arbitrary bone scale, and Resharped keeps its installed model-scale contract. The purpose of the oracle is to validate **motion math and transform order**, not to pretend the resource pack can reproduce every runtime renderer detail.
+The last two checks matter because the first PoC could only prove that our own forward/inverse transform functions agreed with each other. A shared sign, handedness, quaternion or codec mistake could survive such a self-consistency test. The binary reconstruction gate tests what the resource pack actually ships.
+
+The comparison intentionally excludes the legacy final model scale. VMD bone records cannot encode arbitrary bone scale, and Resharped keeps its installed model-scale contract. The oracle therefore normalizes the classic motion into Resharped's fixed scale and validates **position, rotation, transform order and binary encoding**, rather than pretending the resource pack can reproduce every runtime renderer detail.
 
 ## What the oracle does not prove
 
@@ -35,6 +39,10 @@ Passing the oracle does not prove that the generated resource pack is visually p
 
 It also does not turn Old Dream Reforged into the authoritative source for r32. The port describes itself as an r87 procedural translation with later names/behavior added where relevant. When the official 1.12.2/r32 source and Old Dream Reforged differ, this project must document the difference and prefer the official r32 source for the 1.20.1 classic pack.
 
+Compound modern slots are also not treated as if one Old Dream move were their complete oracle. Slots that combine multiple classic moves or modern-only recovery semantics remain separately documented approximations until runtime comparison establishes a better mapping.
+
 ## Current result
 
-For the overlapping classic move set, the two independent implementations agree on the move parameters, progress function and sampled dynamic transform matrices. This gives the baker a much stronger regression baseline than testing only against its own inverse transform.
+For the overlapping classic move set, the two independent implementations agree on the move parameters, progress function and sampled dynamic transform matrices. The generated VMD is additionally decoded and reconstructed through the Resharped hardpoint chain for the simple primary swings. This gives the baker a substantially stronger regression baseline than testing only against its own inverse transform.
+
+The remaining high-value work is now runtime verification in Minecraft 1.20.1: weapon attachment, body pose, first person, early combo transitions and the visual quality of the compound/recovery mappings.
