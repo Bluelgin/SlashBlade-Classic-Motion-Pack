@@ -7,7 +7,7 @@ import unittest
 from tools.vmd.codec import Motion,Key,decode,remap,merge
 from tools.vmd.legacy import pose,legacy_world,progress,dynamic
 from tools.vmd.transforms import chain,from_pose,translation as T,scale as S,rotate as R
-from scripts.generate_motions import generate,passthrough_pmd
+from scripts.generate_motions import generate,passthrough_pmd,legacy_reset_frames,last_legacy_move,resolve_recovery
 
 ROOT=Path(__file__).resolve().parents[1]
 
@@ -81,6 +81,31 @@ class RetargetTests(unittest.TestCase):
         self.assertAlmostEqual(progress(5/12,'SIai'),1)
         self.assertAlmostEqual(progress(5/6,'SIai'),0)
 
+    def test_ground_recovery_uses_classic_combo_reset_clocks(self):
+        slots=json.loads((ROOT/'data/bake_slots.json').read_text())['slots']
+        by_name={x['name']:x for x in slots}
+        expected={
+            'A1':31,
+            'A2':130,
+            'A3 / Sakura right':218,
+            'A4':546,
+            'A4 EX':855,
+            'A5':956,
+        }
+        for name,frame in expected.items():
+            slot=by_name[name]
+            self.assertEqual(slot['recovery_mode'],'legacy_reset')
+            legacy,origin=last_legacy_move(slot)
+            calculated=min(slot['end'],origin+legacy_reset_frames(self.combos[legacy]))
+            self.assertEqual(calculated,frame)
+            self.assertEqual(slot['recovery_start'],frame)
+            self.assertEqual(resolve_recovery(slot,self.combos),frame)
+
+        # A4 EX contains two old moves in one modern slot. The timeout belongs
+        # to the final SReturnEdge clip, not to the A4 EX state start.
+        legacy,origin=last_legacy_move(by_name['A4 EX'])
+        self.assertEqual((legacy,origin),('SReturnEdge',817))
+
     def test_a3_siai_recovery_starts_at_classic_timeout_boundary(self):
         slots=json.loads((ROOT/'data/bake_slots.json').read_text())['slots']
         a3=next(x for x in slots if x['name']=='A3 / Sakura right')
@@ -90,7 +115,7 @@ class RetargetTests(unittest.TestCase):
         # 12-tick reset lands 18 frames after modern slot start: 200 -> 218.
         expected=a3['start']+round(siai['reset_ticks']*30/20)
         self.assertEqual(expected,218)
-        self.assertEqual(a3['recovery_start'],expected)
+        self.assertEqual(resolve_recovery(a3,self.combos),expected)
 
         modern=json.loads((ROOT/'data/resharped_blade_frame_map.json').read_text())['entries']
         by_id={x['id']:x for x in modern}
@@ -102,8 +127,10 @@ class RetargetTests(unittest.TestCase):
         self.assertEqual(by_id['slashblade:sakura_end_finish']['start'],expected)
     def test_all_build_frames_and_determinism(self):
         with tempfile.TemporaryDirectory() as t:
-            p=Path(t);generate(p)
+            p=Path(t);report=generate(p)
             files={str(x.relative_to(p)):x.read_bytes() for x in p.rglob('*') if x.is_file()}
+            self.assertEqual({x['slot']:x['recovery'] for x in report if x['slot'] in {'A1','A2','A3 / Sakura right','A4','A4 EX','A5'}},
+                             {'A1':31,'A2':130,'A3 / Sakura right':218,'A4':546,'A4 EX':855,'A5':956})
             generate(p)
             for name,b in files.items():self.assertEqual(b,(p/name).read_bytes())
             m=decode(files['assets/slashblade/combostate/motion.vmd'])
