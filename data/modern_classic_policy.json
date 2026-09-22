@@ -57,11 +57,11 @@
     {
       "name": "drive_vertical",
       "policy": "SHARED_SLOT_INTERPRETATION",
-      "modern_ids": ["slashblade:drive_vertical", "slashblade:drive_verticall_end"],
+      "modern_ids": ["slashblade:drive_vertical", "slashblade:drive_vertical_end"],
       "shared_with": ["slashblade:upperslash", "slashblade:upperslash_end"],
       "bake_slots": ["Upper / Drive vertical / Wave Edge"],
       "classic_anchors": ["Kiriage"],
-      "reason": "Drive Vertical is a second semantic consumer of the Upper Slash atlas family. The registry id intentionally keeps Resharped's 'verticall' spelling."
+      "reason": "Drive Vertical is a second semantic consumer of the Upper Slash atlas family. The Java combo constant is spelled DRIVE_VERTICALL_END, but its registered resource id is slashblade:drive_vertical_end."
     },
     {
       "name": "wave_edge_vertical",
