@@ -28,12 +28,15 @@ The restart is necessary for a reliable test: Resharped caches the player PMD in
 | A1, A2 | Legacy Saya1/Saya2 blade + sheath curves baked into 1–41 and 100–151; recovery adapted |
 | A3–A5, A4 EX | Coherent classic S-rank motion language: SIai → SSlashEdge → SReturnEdge → SSlashBlade, fitted to modern shared/branching slots; approximate semantics |
 | Air, Upper, Rapid, Rising, Judgement | Source-derived legacy visual candidates; runtime unverified |
-| B, Circle, C, Void, Sakura, shared Drive/Wave slots | Explicit approximations and shared-slot compromises |
+| Void Slash | Dedicated modern **Classic Interpretation**: SlashDim-like attack stage + classic Noutou gesture in Resharped's separate sheath stage |
+| B, Circle, C, Sakura, shared Drive/Wave slots | Shared-slot **Classic Interpretation** compromises; one VMD region must serve every modern consumer |
 | Player body | Modern custom full-body poses bypassed by a generated PMD adapter; underlying **1.20.1 vanilla poses** retained, not an exact 1.12.2 body restoration |
 | Piercing | Upstream blade motion untouched; player pose adapter is global and also affects this move |
 | Gameplay | Resharped damage, movement, timing, branches and effects remain authoritative |
 
-The ground classic chain begins with two **saya strikes**. The shared A3 slot then uses old `SIai`; on Resharped's powered continuation the visual sequence proceeds through `SSlashEdge → SReturnEdge → SSlashBlade`. A resource pack cannot select Battou versus SIai dynamically from old rank/current modern power state, so the regular A4 path is an explicit compromise. The source has no old A1–A5 VMD slots to copy. See [source provenance](docs/research/legacy-1.12.2-source.md), [semantic mapping](docs/mapping/legacy-to-resharped.md), and [limitations](docs/limitations.md).
+The ground classic chain begins with two **saya strikes**. The shared A3 slot then uses old `SIai`; on Resharped's powered continuation the visual sequence proceeds through `SSlashEdge → SReturnEdge → SSlashBlade`. A resource pack cannot select Battou versus SIai dynamically from old rank/current modern power state, so the regular A4 path is an explicit compromise. The source has no old A1–A5 VMD slots to copy.
+
+The project now distinguishes **Classic Restoration** from **Classic Interpretation**. Restoration samples a directly corresponding r32 move. Interpretation keeps a modern Resharped move/state but expresses it using r32 motion language. Modern frame sharing is machine-checked so improving one move cannot silently overwrite another move that consumes the same VMD frames. See [modern Classic Interpretation policy](docs/mapping/modern-classic-interpretation.md), [source provenance](docs/research/legacy-1.12.2-source.md), [semantic mapping](docs/mapping/legacy-to-resharped.md), and [limitations](docs/limitations.md).
 
 ## Comparison and verification
 
