@@ -28,8 +28,8 @@ The restart is necessary for a reliable test: Resharped caches the player PMD in
 | A1, A2 | Legacy Saya1/Saya2 blade + sheath curves baked into 1–41 and 100–151; recovery adapted |
 | A3–A5, A4 EX | Coherent classic S-rank motion language: SIai → SSlashEdge → SReturnEdge → SSlashBlade, fitted to modern shared/branching slots; approximate semantics |
 | Air, Upper, Rapid, Rising, Judgement | Source-derived legacy visual candidates; runtime unverified |
-| Void Slash | Dedicated modern **Classic Interpretation**: SlashDim-like attack stage + classic Noutou gesture in Resharped's separate sheath stage |
-| Piercing | Dedicated modern **Classic Interpretation**: Resharped's isolated `piercing.vmd` is replaced by r32 Stinger thrust language with source-timed Noutou recovery; `piercing_pl.vmd` is replaced by the vanilla-body passthrough adapter |
+| Void Slash | Dedicated modern **Classic Interpretation**: preparation until the modern tick-16 release, then SlashDim-like attack stage + classic Noutou gesture in Resharped's separate sheath stage |
+| Piercing | Dedicated modern **Classic Interpretation**: Resharped's isolated `piercing.vmd` is replaced by r32 Stinger thrust language with source-timed delayed Noutou recovery; `piercing_pl.vmd` is replaced by the vanilla-body passthrough adapter |
 | B, Circle, C, Sakura, shared Drive/Wave slots | Shared-slot **Classic Interpretation** compromises; one VMD region must serve every modern consumer |
 | Normal slash light / `EntitySlashEffect` | Global generated **Classic Trail Adapter** replaces modern `slash.obj/png` with a narrow tapered afterimage. This covers every `AttackManager.doSlash(...)` effect and Void Slash without per-combo Java changes |
 | Drive projectile visual | r32's procedural 14-point Drive prism is baked into Resharped's fixed `drive.obj` transform; generated neutral `ss.png` keeps modern blade color tinting |
@@ -39,11 +39,12 @@ The restart is necessary for a reliable test: Resharped caches the player PMD in
 | First-person idle/hold camera transform | **`IMPOSSIBLE_RESOURCE_PACK_ONLY` on the pinned target.** Resharped resets the incoming item-render pose to identity and applies its own hard-coded first-person transform, so item-model `firstperson_*` display JSON cannot restore r32's old hold position/angle |
 | Active main-hand standby | Frames 0–1 already use the source-derived r32 `None` blade/saya pose |
 | Back/offhand carry poses | **`IMPOSSIBLE_RESOURCE_PACK_ONLY` on the pinned target.** Modern `CarryType` placement is hard-coded in Java and does not consume the VMD |
+| Attack / sheath audio | **Exact r32 orchestration is `IMPOSSIBLE_RESOURCE_PACK_ONLY` without global vanilla-sound side effects.** r32 and Resharped select different vanilla SoundEvents/pitch/timing in Java; the default pack does not replace trident/chain/etc. sounds globally |
 | Gameplay | Resharped damage, movement, timing, branches and effect entities remain authoritative |
 
 The ground classic chain begins with two **saya strikes**. The shared A3 slot then uses old `SIai`; on Resharped's powered continuation the visual sequence proceeds through `SSlashEdge → SReturnEdge → SSlashBlade`. A resource pack cannot select Battou versus SIai dynamically from old rank/current modern power state, so the regular A4 path is an explicit compromise. The source has no old A1–A5 VMD slots to copy.
 
-Piercing has its own independent modern atlas, so it can be classicized without stealing frames from the main chain. Frames 1–32 stay in the r32 neutral blade/saya pose; frame 33 switches to old `Stinger`, matching the modern Java lunge start. Stinger's 20-tick r32 reset clock lands at VMD frame 63, where a fresh `Noutou` recovery begins before returning to neutral. Forward movement, hit timing, just timing and sound remain Resharped behavior.
+Piercing has its own independent modern atlas, so it can be classicized without stealing frames from the main chain. Frames 1–32 stay in the r32 neutral blade/saya pose; frame 33 switches to old `Stinger`, matching the modern Java lunge start. Stinger's 20-tick r32 reset clock lands at VMD frame 63, where a fresh `Noutou` recovery begins. The six-tick Noutou swing reaches its final pose at frame 72, that pose is held through 77 because r32 entered Noutou with a delayed `LastActionTime`, and frame 78 returns to neutral. Forward movement, hit timing, just timing and sound remain Resharped behavior.
 
 The project distinguishes **Classic Restoration** from **Classic Interpretation**. Restoration samples a directly corresponding r32 move or procedural visual. Interpretation keeps a modern Resharped move/state but expresses it using r32 motion/effect language. Modern frame sharing is machine-checked so improving one move cannot silently overwrite another move that consumes the same VMD frames. See [modern Classic Interpretation policy](docs/mapping/modern-classic-interpretation.md), [Piercing interpretation](docs/research/piercing-classic-interpretation.md), [classic attack-effect adaptation](docs/mapping/classic-effect-adaptation.md), [source provenance](docs/research/legacy-1.12.2-source.md), [semantic mapping](docs/mapping/legacy-to-resharped.md), [first-person renderer audit](docs/research/first-person-rendering.md), [standby/carry audit](docs/research/standby-carry-rendering.md), and [limitations](docs/limitations.md).
 
@@ -54,6 +55,10 @@ The old r32 view is not just an item-model transform. `BladeFirstPersonRender` a
 ### Resource-pack effect ceiling
 
 The pack can replace Resharped's hard-coded effect meshes/textures, but it cannot replace the Java entity renderer. For normal slash effects, Resharped still owns spawn timing, lifetime, `rotationOffset - 135° * progress`, scale/flattening, blade color and rank-dependent render passes. Drive and Judgement Cut likewise keep their modern entity timing/choreography. The new effect assets are therefore designed to remain visually coherent under those fixed transforms; they are not a claim that the old blade-attached `LayerSlashBlade` trail renderer is running on 1.20.1.
+
+### Resource-pack audio ceiling
+
+Classic r32 attack sound is not simply a SlashBlade-owned `.ogg` bank. The pinned source frequently calls vanilla Minecraft SoundEvents with distinctive runtime parameters; the ordinary r32 SlashBlade attack path, for example, uses player sweep at volume `0.8` and pitch `0.01`. Resharped instead uses modern Java-selected sounds such as trident throw for slash/Piercing effects and chain hit for quick sheath actions. A resource pack can replace the files behind those vanilla events, but it cannot change the event selected by Java, the per-call pitch/volume or the callback tick. Replacing the vanilla files would also change normal Minecraft tridents/chains globally, so the default pack deliberately leaves those sounds alone.
 
 ## Comparison and verification
 
@@ -72,7 +77,7 @@ python scripts/build_pack.py
 python scripts/validate_pack.py dist/SlashBlade-Classic-Motion-Pack-1.20.1-v0.1.0.zip
 ```
 
-The build regenerates all shipped VMD/PMD and classic effect resources, writes an original geometric icon, validates the pack and creates a deterministic ZIP with `pack.mcmeta` at its root. Players do not run these tools. [Development details](docs/development.md).
+The build regenerates all shipped VMD/PMD and classic effect resources, writes an original geometric icon, validates the pack and creates a deterministic ZIP with `pack.mcmeta` at its root. `pack/` is only generated staging; a fresh checkout intentionally keeps just its static `pack.mcmeta`, so do not zip that directory before running the build. Players do not run these tools. [Development details](docs/development.md).
 
 ## Credits and license
 

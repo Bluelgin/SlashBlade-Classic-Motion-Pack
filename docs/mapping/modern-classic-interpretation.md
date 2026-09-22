@@ -27,12 +27,12 @@ The first pilot is Void Slash. Resharped gives it a dedicated region:
 - `VOID_SLASH`: 2200–2277
 - `VOID_SLASH_SHEATH`: 2278–2299
 
-The pack now interprets these as two distinct modern states:
+The pack interprets these as two distinct modern states:
 
-1. `2200–2277`: SlashDim-like attack language. The classic SlashDim timeout still returns to neutral.
-2. `2278–2299`: a fresh classic Noutou gesture for the modern sheath state, then neutral at the r32 Noutou reset clock.
+1. `2200–2277`: SlashDim-like attack language, but **not** from frame 2200. Resharped's Java callback actually releases Void Slash at elapsed tick 16, so the classic gesture stays at its preparation/start pose until VMD frame 2224, runs from there, and reaches the r32 SlashDim timeout at frame 2236. SlashDim then resets directly to None.
+2. `2278–2299`: a fresh classic Noutou gesture for the modern sheath state. It reaches the final six-tick swing pose at 2287, holds that pose while the old delayed Noutou state remains active, and becomes neutral at 2293.
 
-This preserves the modern two-stage structure while keeping both stages visually in the old renderer's vocabulary. It intentionally differs from claiming that r32 SlashDim itself transitioned to Noutou; it did not.
+This preserves the modern two-stage structure while keeping both stages visually in the old renderer's vocabulary. It intentionally differs from claiming that r32 SlashDim itself transitioned to Noutou; it did not. The split exists because the modern move has a separate sheath state.
 
 ### Shared-slot interpretation
 
@@ -60,9 +60,10 @@ The policy also records behavior that cannot be independently restored or interp
 - damage, hitboxes, invulnerability and cancel windows;
 - entity movement/velocity;
 - Drive/Wave Edge projectile creation and target logic;
-- dynamic barrier/trail behavior whose timing is calculated in Java.
+- dynamic barrier/trail behavior whose timing is calculated in Java;
+- attack/sheath SoundEvent selection, pitch/volume and callback timing.
 
-The resource pack may make the animation around these actions look classic, but it does not claim to reproduce their runtime mechanics.
+The resource pack may make the animation around these actions look classic, but it does not claim to reproduce their runtime mechanics. Replacing a vanilla sound asset globally is technically possible but would also alter ordinary Minecraft users of that SoundEvent, so the default pack does not treat that as an exact audio restoration path.
 
 ## Why this distinction matters
 

@@ -38,13 +38,16 @@ frames  0..32   r32 None pose (modern preparation/hold)
 frame      33   switch to full r32 Stinger thrust pose
 frames 33..62   hold Stinger while modern Java owns forward movement / hit
 frame      63   r32 Stinger reset clock expires -> fresh Noutou
-frames 63..71   Noutou swing
-frames 72..90   r32 None pose
+frames 63..71   six-tick / nine-frame Noutou swing
+frames 72..77   hold final Noutou pose while the delayed source state remains active
+frames 78..90   r32 None pose
 ```
 
-The recovery frame is source-derived: `33 + round(20 ticks * 30 VMD fps / 20 game tps) = 63`.
+The Stinger recovery frame is source-derived: `33 + round(20 ticks * 30 VMD fps / 20 game tps) = 63`.
 
-This timing also lands naturally inside Resharped's `piercing_end`/`piercing_end2` handoff. The modern quick-sheath sound at frame 65 remains Java-owned and occurs during the generated Noutou gesture.
+The later neutral boundary needs one more piece of r32 source behavior. When an ordinary non-saya move times out, `ItemSlashBlade.onUpdate` enters Noutou with `LastActionTime = currentTime + 5`. Noutou itself has `comboResetTicks = 5`. The visible six-tick swing therefore reaches its final pose at frame 72, but the old state has not expired yet; the pack holds that final pose through frame 77 and returns to None at frame 78.
+
+This timing also lands inside Resharped's `piercing_end`/`piercing_end2` handoff. The modern quick-sheath sound at frame 65 remains Java-owned and occurs during the generated Noutou gesture. Exact old attack/sheath SoundEvent selection, pitch and callback timing are outside a normal resource pack.
 
 ## Player body strategy
 
