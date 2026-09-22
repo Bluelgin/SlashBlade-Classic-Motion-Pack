@@ -1,0 +1,353 @@
+{
+  "repository": "0999312/SlashBlade_Resharped",
+  "commit": "6e2a0a092fb794d7ea56fd83452869674f3ab1c7",
+  "minecraft": "1.20.1",
+  "version": "1.9.65",
+  "source_sha256": "3606fc661f24c2e0405d11f166a05e5d433c8445ae394bc5a4b7eb85d00703c3",
+  "entries": [
+    {
+      "combo": "PIERCING",
+      "resource": "slashblade:combostate/piercing_pl.vmd",
+      "start": 1,
+      "end": 90,
+      "loop": false,
+      "blend_legs": true
+    },
+    {
+      "combo": "PIERCING_JUST",
+      "resource": "slashblade:combostate/piercing_pl.vmd",
+      "start": 34,
+      "end": 90,
+      "loop": false,
+      "blend_legs": true
+    },
+    {
+      "combo": "COMBO_A1_END2",
+      "resource": "slashblade:model/pa/player_motion.vmd",
+      "start": 21,
+      "end": 41,
+      "loop": false,
+      "blend_legs": true
+    },
+    {
+      "combo": "COMBO_A1",
+      "resource": "slashblade:model/pa/player_motion.vmd",
+      "start": 1,
+      "end": 41,
+      "loop": false,
+      "blend_legs": true
+    },
+    {
+      "combo": "COMBO_A2",
+      "resource": "slashblade:model/pa/player_motion.vmd",
+      "start": 100,
+      "end": 151,
+      "loop": false,
+      "blend_legs": true
+    },
+    {
+      "combo": "COMBO_C",
+      "resource": "slashblade:model/pa/player_motion.vmd",
+      "start": 400,
+      "end": 488,
+      "loop": false,
+      "blend_legs": true
+    },
+    {
+      "combo": "COMBO_A3",
+      "resource": "slashblade:model/pa/player_motion.vmd",
+      "start": 200,
+      "end": 306,
+      "loop": false,
+      "blend_legs": true
+    },
+    {
+      "combo": "COMBO_A4",
+      "resource": "slashblade:model/pa/player_motion.vmd",
+      "start": 500,
+      "end": 608,
+      "loop": false,
+      "blend_legs": true
+    },
+    {
+      "combo": "COMBO_A4_EX",
+      "resource": "slashblade:model/pa/player_motion.vmd",
+      "start": 800,
+      "end": 894,
+      "loop": false,
+      "blend_legs": true
+    },
+    {
+      "combo": "COMBO_A5",
+      "resource": "slashblade:model/pa/player_motion.vmd",
+      "start": 900,
+      "end": 1061,
+      "loop": false,
+      "blend_legs": true
+    },
+    {
+      "combo": "COMBO_B1",
+      "resource": "slashblade:model/pa/player_motion.vmd",
+      "start": 700,
+      "end": 787,
+      "loop": false,
+      "blend_legs": true
+    },
+    {
+      "combo": "COMBO_B2",
+      "resource": "slashblade:model/pa/player_motion.vmd",
+      "start": 710,
+      "end": 787,
+      "loop": false,
+      "blend_legs": true
+    },
+    {
+      "combo": "COMBO_B3",
+      "resource": "slashblade:model/pa/player_motion.vmd",
+      "start": 710,
+      "end": 787,
+      "loop": false,
+      "blend_legs": true
+    },
+    {
+      "combo": "COMBO_B4",
+      "resource": "slashblade:model/pa/player_motion.vmd",
+      "start": 710,
+      "end": 787,
+      "loop": false,
+      "blend_legs": true
+    },
+    {
+      "combo": "COMBO_B5",
+      "resource": "slashblade:model/pa/player_motion.vmd",
+      "start": 710,
+      "end": 787,
+      "loop": false,
+      "blend_legs": true
+    },
+    {
+      "combo": "COMBO_B6",
+      "resource": "slashblade:model/pa/player_motion.vmd",
+      "start": 710,
+      "end": 787,
+      "loop": false,
+      "blend_legs": true
+    },
+    {
+      "combo": "COMBO_B7",
+      "resource": "slashblade:model/pa/player_motion.vmd",
+      "start": 710,
+      "end": 787,
+      "loop": false,
+      "blend_legs": true
+    },
+    {
+      "combo": "CIRCLE_SLASH",
+      "resource": "slashblade:model/pa/player_motion.vmd",
+      "start": 725,
+      "end": 787,
+      "loop": false,
+      "blend_legs": true
+    },
+    {
+      "combo": "AERIAL_RAVE_A1",
+      "resource": "slashblade:model/pa/player_motion.vmd",
+      "start": 1100,
+      "end": 1132,
+      "loop": false,
+      "blend_legs": false
+    },
+    {
+      "combo": "AERIAL_RAVE_A2",
+      "resource": "slashblade:model/pa/player_motion.vmd",
+      "start": 1200,
+      "end": 1241,
+      "loop": false,
+      "blend_legs": false
+    },
+    {
+      "combo": "AERIAL_RAVE_A3",
+      "resource": "slashblade:model/pa/player_motion.vmd",
+      "start": 1300,
+      "end": 1338,
+      "loop": false,
+      "blend_legs": false
+    },
+    {
+      "combo": "AERIAL_RAVE_B3",
+      "resource": "slashblade:model/pa/player_motion.vmd",
+      "start": 1400,
+      "end": 1443,
+      "loop": false,
+      "blend_legs": false
+    },
+    {
+      "combo": "AERIAL_RAVE_B4",
+      "resource": "slashblade:model/pa/player_motion.vmd",
+      "start": 1500,
+      "end": 1547,
+      "loop": false,
+      "blend_legs": false
+    },
+    {
+      "combo": "UPPERSLASH",
+      "resource": "slashblade:model/pa/player_motion.vmd",
+      "start": 1600,
+      "end": 1693,
+      "loop": false,
+      "blend_legs": true
+    },
+    {
+      "combo": "UPPERSLASH_JUMP",
+      "resource": "slashblade:model/pa/player_motion.vmd",
+      "start": 1700,
+      "end": 1717,
+      "loop": false,
+      "blend_legs": false
+    },
+    {
+      "combo": "AERIAL_CLEAVE",
+      "resource": "slashblade:model/pa/player_motion.vmd",
+      "start": 1800,
+      "end": 1817,
+      "loop": false,
+      "blend_legs": false
+    },
+    {
+      "combo": "AERIAL_CLEAVE_LOOP",
+      "resource": "slashblade:model/pa/player_motion.vmd",
+      "start": 1812,
+      "end": 1817,
+      "loop": true,
+      "blend_legs": false
+    },
+    {
+      "combo": "AERIAL_CLEAVE_LANDING",
+      "resource": "slashblade:model/pa/player_motion.vmd",
+      "start": 1816,
+      "end": 1886,
+      "loop": false,
+      "blend_legs": true
+    },
+    {
+      "combo": "RAPID_SLASH",
+      "resource": "slashblade:model/pa/player_motion.vmd",
+      "start": 2000,
+      "end": 2073,
+      "loop": false,
+      "blend_legs": false
+    },
+    {
+      "combo": "RAPID_SLASH_QUICK",
+      "resource": "slashblade:model/pa/player_motion.vmd",
+      "start": 2000,
+      "end": 2073,
+      "loop": false,
+      "blend_legs": false
+    },
+    {
+      "combo": "RISING_STAR",
+      "resource": "slashblade:model/pa/player_motion.vmd",
+      "start": 2100,
+      "end": 2147,
+      "loop": false,
+      "blend_legs": false
+    },
+    {
+      "combo": "JUDGEMENT_CUT",
+      "resource": "slashblade:model/pa/player_motion.vmd",
+      "start": 1900,
+      "end": 1963,
+      "loop": false,
+      "blend_legs": false
+    },
+    {
+      "combo": "JUDGEMENT_CUT_SLASH_AIR",
+      "resource": "slashblade:model/pa/player_motion.vmd",
+      "start": 1923,
+      "end": 1963,
+      "loop": false,
+      "blend_legs": false
+    },
+    {
+      "combo": "JUDGEMENT_CUT_SLASH_JUST",
+      "resource": "slashblade:model/pa/player_motion.vmd",
+      "start": 1923,
+      "end": 1963,
+      "loop": false,
+      "blend_legs": false
+    },
+    {
+      "combo": "VOID_SLASH",
+      "resource": "slashblade:model/pa/player_motion.vmd",
+      "start": 2200,
+      "end": 2299,
+      "loop": false,
+      "blend_legs": false
+    },
+    {
+      "combo": "SAKURA_END_LEFT",
+      "resource": "slashblade:model/pa/player_motion.vmd",
+      "start": 1816,
+      "end": 1859,
+      "loop": false,
+      "blend_legs": false
+    },
+    {
+      "combo": "SAKURA_END_RIGHT",
+      "resource": "slashblade:model/pa/player_motion.vmd",
+      "start": 204,
+      "end": 314,
+      "loop": false,
+      "blend_legs": false
+    },
+    {
+      "combo": "SAKURA_END_LEFT_AIR",
+      "resource": "slashblade:model/pa/player_motion.vmd",
+      "start": 1300,
+      "end": 1328,
+      "loop": false,
+      "blend_legs": false
+    },
+    {
+      "combo": "SAKURA_END_RIGHT_AIR",
+      "resource": "slashblade:model/pa/player_motion.vmd",
+      "start": 1200,
+      "end": 1241,
+      "loop": false,
+      "blend_legs": false
+    },
+    {
+      "combo": "DRIVE_HORIZONTAL",
+      "resource": "slashblade:model/pa/player_motion.vmd",
+      "start": 400,
+      "end": 488,
+      "loop": false,
+      "blend_legs": true
+    },
+    {
+      "combo": "DRIVE_VERTICAL",
+      "resource": "slashblade:model/pa/player_motion.vmd",
+      "start": 1600,
+      "end": 1693,
+      "loop": false,
+      "blend_legs": true
+    },
+    {
+      "combo": "WAVE_EDGE_VERTICAL",
+      "resource": "slashblade:model/pa/player_motion.vmd",
+      "start": 1600,
+      "end": 1693,
+      "loop": false,
+      "blend_legs": true
+    },
+    {
+      "combo": "JUDGEMENT_CUT_END",
+      "resource": "slashblade:model/pa/player_motion.vmd",
+      "start": 1923,
+      "end": 1963,
+      "loop": false,
+      "blend_legs": true
+    }
+  ]
+}

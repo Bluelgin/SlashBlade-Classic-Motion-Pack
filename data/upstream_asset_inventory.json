@@ -1,0 +1,190 @@
+{
+  "commit": "6e2a0a092fb794d7ea56fd83452869674f3ab1c7",
+  "resources": [
+    {
+      "path": "src/main/resources/assets/slashblade/combostate/motion.vmd",
+      "git_blob_sha": "a0527563cece970fd8604c5c059c5533e190e129",
+      "size": 187805
+    },
+    {
+      "path": "src/main/resources/assets/slashblade/combostate/piercing.vmd",
+      "git_blob_sha": "68ee49bc2d797358e1dbbbeb064f7e44b9f9bf19",
+      "size": 5957
+    },
+    {
+      "path": "src/main/resources/assets/slashblade/combostate/piercing_pl.vmd",
+      "git_blob_sha": "9e2da0aad62a87a196701df45fde47ced574abae",
+      "size": 7622
+    },
+    {
+      "path": "src/main/resources/assets/slashblade/combostate/test.vmd",
+      "git_blob_sha": "c15bd07a4dd42218d0139fe2a4aab178699cc5aa",
+      "size": 4625
+    },
+    {
+      "path": "src/main/resources/assets/slashblade/combostate/test_pl.vmd",
+      "git_blob_sha": "b603cdca4a5e38fe252826a2d4de58f984977e80",
+      "size": 1739
+    },
+    {
+      "path": "src/main/resources/assets/slashblade/model/blade.obj",
+      "git_blob_sha": "d3997af24caa6aa666fae767c96ef61b9dfac9b4",
+      "size": 79553
+    },
+    {
+      "path": "src/main/resources/assets/slashblade/model/bladeholder.pmd",
+      "git_blob_sha": "df146feaaf1b73e20c5125d0c3c64cb81e5093c0",
+      "size": 3301
+    },
+    {
+      "path": "src/main/resources/assets/slashblade/model/named/agito.obj",
+      "git_blob_sha": "306be78c073c1b754504783b359affbe412e9039",
+      "size": 168167
+    },
+    {
+      "path": "src/main/resources/assets/slashblade/model/named/dios/dios.obj",
+      "git_blob_sha": "1f6d307f46f022c9f85033f8302a3415d2909b6d",
+      "size": 244064
+    },
+    {
+      "path": "src/main/resources/assets/slashblade/model/named/muramasa/muramasa.obj",
+      "git_blob_sha": "fd01d83a8312a57ef826c318ebb2f83c2d37ccbf",
+      "size": 186136
+    },
+    {
+      "path": "src/main/resources/assets/slashblade/model/named/sange/sange.obj",
+      "git_blob_sha": "0ca7112f3fe8e72b3a9029ac4d8bc1b95b5f5a1c",
+      "size": 196364
+    },
+    {
+      "path": "src/main/resources/assets/slashblade/model/named/yamato.obj",
+      "git_blob_sha": "051f5d754aeb4d12d3ef5f18b4f2040343b755ce",
+      "size": 121878
+    },
+    {
+      "path": "src/main/resources/assets/slashblade/model/named/yasha/yasha.obj",
+      "git_blob_sha": "f9d7c052135261f76ff57d012fe21a09a4d7d7ca",
+      "size": 75278
+    },
+    {
+      "path": "src/main/resources/assets/slashblade/model/named/yasha/yasha_true.obj",
+      "git_blob_sha": "5b81311910ce7d588d3f58e15e820eb8ad948345",
+      "size": 65852
+    },
+    {
+      "path": "src/main/resources/assets/slashblade/model/pa/alex.pmd",
+      "git_blob_sha": "7941008c80caee2e42bfe762ee5c6c834520bee9",
+      "size": 528924
+    },
+    {
+      "path": "src/main/resources/assets/slashblade/model/pa/player_motion.vmd",
+      "git_blob_sha": "7027ce33ff956f1182226905ae22e6cbc14fe0e1",
+      "size": 148388
+    },
+    {
+      "path": "src/main/resources/assets/slashblade/model/util/drive.obj",
+      "git_blob_sha": "ec50034dabd403a4bcd14ef3d3f06ad2a5da54f9",
+      "size": 5834
+    },
+    {
+      "path": "src/main/resources/assets/slashblade/model/util/durability.obj",
+      "git_blob_sha": "08b5a7df276590f9975ad16946c486f47969ffb4",
+      "size": 2611
+    },
+    {
+      "path": "src/main/resources/assets/slashblade/model/util/grim_grip.obj",
+      "git_blob_sha": "91e9f4b0a361880e9ba90174ec9993ce277a8499",
+      "size": 4066
+    },
+    {
+      "path": "src/main/resources/assets/slashblade/model/util/lockon.obj",
+      "git_blob_sha": "3a5868611276de288bc0625677d8aecee19dac82",
+      "size": 9915
+    },
+    {
+      "path": "src/main/resources/assets/slashblade/model/util/ring.obj",
+      "git_blob_sha": "5b227d06cdc726fd76f65ec3f9191812e027f433",
+      "size": 373
+    },
+    {
+      "path": "src/main/resources/assets/slashblade/model/util/slash.obj",
+      "git_blob_sha": "68fc8afdd73b4447a968f8fdfca26744cbbc2f40",
+      "size": 23278
+    },
+    {
+      "path": "src/main/resources/assets/slashblade/model/util/slashdim.obj",
+      "git_blob_sha": "9ab8de31a33970b884df9f4683ece271e9f12889",
+      "size": 39164
+    },
+    {
+      "path": "src/main/resources/assets/slashblade/model/util/ss.obj",
+      "git_blob_sha": "69178bae026a3137d68c69925c0d1fc35efe7fcc",
+      "size": 9392
+    },
+    {
+      "path": "src/main/resources/assets/slashblade/model/util/trail.obj",
+      "git_blob_sha": "321ac0298c2dcf271bd90be495d00fe832751da5",
+      "size": 51
+    },
+    {
+      "path": "src/main/resources/assets/slashblade/models/item/crystal.obj",
+      "git_blob_sha": "2bce2f6a0ddf97bf0934cf8b64dffec4b0527501",
+      "size": 20833
+    },
+    {
+      "path": "src/main/resources/assets/slashblade/models/item/ingot.obj",
+      "git_blob_sha": "adc3090816e356c8d928dec4f91e9d48ad08bc94",
+      "size": 10462
+    },
+    {
+      "path": "src/main/resources/assets/slashblade/models/item/soul.obj",
+      "git_blob_sha": "1338fb0f032c0d02716e6e89a423bfa6cdfd6091",
+      "size": 32597
+    },
+    {
+      "path": "src/main/resources/assets/slashblade/models/item/sphere.obj",
+      "git_blob_sha": "7ddfd8d15de2164bbda5a7cda1f6565fb5a383cf",
+      "size": 73257
+    },
+    {
+      "path": "src/main/resources/assets/slashblade/models/item/stand_1.obj",
+      "git_blob_sha": "ead4934b5a0a040c67c0707f1c7de0e15ce10f7e",
+      "size": 10143
+    },
+    {
+      "path": "src/main/resources/assets/slashblade/models/item/stand_2.obj",
+      "git_blob_sha": "365f462ff7fc19091e2bde2eb53a6df6ceb30110",
+      "size": 12369
+    },
+    {
+      "path": "src/main/resources/assets/slashblade/models/item/stand_s.obj",
+      "git_blob_sha": "f6811ba0ead6fc82fde8969db65b8bc84d719fb5",
+      "size": 9951
+    },
+    {
+      "path": "src/main/resources/assets/slashblade/models/item/stand_v.obj",
+      "git_blob_sha": "afd1801f320056361140d186981b3493e755ff3c",
+      "size": 5043
+    },
+    {
+      "path": "src/main/resources/assets/slashblade/models/item/stand_w_1.obj",
+      "git_blob_sha": "a27152e183e8ef6240af3a4f43a732273100cdef",
+      "size": 4886
+    },
+    {
+      "path": "src/main/resources/assets/slashblade/models/item/stand_w_2.obj",
+      "git_blob_sha": "2500f891cc6e759c722670e09722354c6bd84432",
+      "size": 7296
+    },
+    {
+      "path": "src/main/resources/assets/slashblade/models/item/tiny.obj",
+      "git_blob_sha": "11231ed1c08116f645216568fe7602cbfdce1f5a",
+      "size": 12995
+    },
+    {
+      "path": "src/main/resources/assets/slashblade/models/item/trapezohedron.obj",
+      "git_blob_sha": "aa74bafbb51a144224b20850fb69e048f0953710",
+      "size": 20811
+    }
+  ]
+}

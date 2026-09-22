@@ -1,0 +1,365 @@
+[
+  {
+    "model": "BladeHolder",
+    "key_count": 1689,
+    "bones": {
+      "JointA1": {
+        "count": 371,
+        "first": 0,
+        "last": 2299
+      },
+      "JointA2": {
+        "count": 144,
+        "first": 0,
+        "last": 2299
+      },
+      "JointA3": {
+        "count": 345,
+        "first": 0,
+        "last": 2299
+      },
+      "JointB1": {
+        "count": 306,
+        "first": 0,
+        "last": 2299
+      },
+      "JointB2": {
+        "count": 129,
+        "first": 0,
+        "last": 2299
+      },
+      "JointB3": {
+        "count": 213,
+        "first": 0,
+        "last": 2299
+      },
+      "hardpointA": {
+        "count": 40,
+        "first": 0,
+        "last": 2299
+      },
+      "hardpointB": {
+        "count": 40,
+        "first": 0,
+        "last": 2299
+      },
+      "センター": {
+        "count": 101,
+        "first": 0,
+        "last": 2299
+      }
+    },
+    "file": "motion.vmd",
+    "sha256": "e19477361b5d2dd61d15cb2477a1464645531d2e4730af87ee78220e85a68733"
+  },
+  {
+    "model": "Bladeholder_arm",
+    "key_count": 53,
+    "bones": {
+      "JointA1": {
+        "count": 2,
+        "first": 0,
+        "last": 84
+      },
+      "JointA2": {
+        "count": 2,
+        "first": 0,
+        "last": 84
+      },
+      "JointA3": {
+        "count": 6,
+        "first": 0,
+        "last": 84
+      },
+      "JointB1": {
+        "count": 2,
+        "first": 0,
+        "last": 84
+      },
+      "JointB2": {
+        "count": 2,
+        "first": 0,
+        "last": 84
+      },
+      "JointB3": {
+        "count": 2,
+        "first": 0,
+        "last": 84
+      },
+      "hardpointA": {
+        "count": 20,
+        "first": 0,
+        "last": 84
+      },
+      "hardpointB": {
+        "count": 15,
+        "first": 0,
+        "last": 84
+      },
+      "センター": {
+        "count": 2,
+        "first": 0,
+        "last": 84
+      }
+    },
+    "file": "piercing.vmd",
+    "sha256": "3a9ba852f1628d49a0a5ca32ff0899a6d22c7ede30e45a5de2e78a322589f4ed"
+  },
+  {
+    "model": "Alex_arm",
+    "key_count": 68,
+    "bones": {
+      "body": {
+        "count": 2,
+        "first": 0,
+        "last": 84
+      },
+      "head": {
+        "count": 8,
+        "first": 0,
+        "last": 84
+      },
+      "left arm": {
+        "count": 18,
+        "first": 0,
+        "last": 84
+      },
+      "left leg": {
+        "count": 3,
+        "first": 0,
+        "last": 84
+      },
+      "right arm": {
+        "count": 17,
+        "first": 0,
+        "last": 84
+      },
+      "right leg": {
+        "count": 9,
+        "first": 0,
+        "last": 84
+      },
+      "torso": {
+        "count": 9,
+        "first": 0,
+        "last": 84
+      },
+      "全ての親": {
+        "count": 2,
+        "first": 0,
+        "last": 84
+      }
+    },
+    "file": "piercing_pl.vmd",
+    "sha256": "135ebf04d39aad2f4edb6f554964cfdb10d2e5f64b88597decad3050cda26068"
+  },
+  {
+    "model": "Alex",
+    "key_count": 1336,
+    "bones": {
+      "body": {
+        "count": 191,
+        "first": 0,
+        "last": 2299
+      },
+      "head": {
+        "count": 115,
+        "first": 0,
+        "last": 2299
+      },
+      "left arm": {
+        "count": 301,
+        "first": 0,
+        "last": 2299
+      },
+      "left leg": {
+        "count": 133,
+        "first": 0,
+        "last": 2299
+      },
+      "right arm": {
+        "count": 312,
+        "first": 0,
+        "last": 2299
+      },
+      "right leg": {
+        "count": 129,
+        "first": 0,
+        "last": 2299
+      },
+      "torso": {
+        "count": 74,
+        "first": 0,
+        "last": 2299
+      },
+      "下半身": {
+        "count": 2,
+        "first": 0,
+        "last": 1
+      },
+      "両目": {
+        "count": 2,
+        "first": 0,
+        "last": 1
+      },
+      "全ての親": {
+        "count": 53,
+        "first": 0,
+        "last": 2299
+      },
+      "右ひざ": {
+        "count": 2,
+        "first": 0,
+        "last": 1
+      },
+      "右ひじ": {
+        "count": 2,
+        "first": 0,
+        "last": 1
+      },
+      "右手首": {
+        "count": 2,
+        "first": 0,
+        "last": 1
+      },
+      "右目": {
+        "count": 2,
+        "first": 0,
+        "last": 1
+      },
+      "右肩": {
+        "count": 2,
+        "first": 0,
+        "last": 1
+      },
+      "右足首": {
+        "count": 1,
+        "first": 0,
+        "last": 0
+      },
+      "左ひざ": {
+        "count": 2,
+        "first": 0,
+        "last": 1
+      },
+      "左ひじ": {
+        "count": 2,
+        "first": 0,
+        "last": 1
+      },
+      "左手首": {
+        "count": 2,
+        "first": 0,
+        "last": 1
+      },
+      "左目": {
+        "count": 2,
+        "first": 0,
+        "last": 1
+      },
+      "左肩": {
+        "count": 2,
+        "first": 0,
+        "last": 1
+      },
+      "左足首": {
+        "count": 1,
+        "first": 0,
+        "last": 0
+      },
+      "首": {
+        "count": 2,
+        "first": 0,
+        "last": 1
+      }
+    },
+    "file": "player_motion.vmd",
+    "sha256": "339addd939a7d7ec11facb43df0afa9785a3d488bc1bf15c9956f8fde204b850"
+  },
+  {
+    "model": "Bladeholder_arm",
+    "key_count": 41,
+    "bones": {
+      "JointA1": {
+        "count": 5,
+        "first": 0,
+        "last": 90
+      },
+      "JointA2": {
+        "count": 5,
+        "first": 0,
+        "last": 90
+      },
+      "JointA3": {
+        "count": 5,
+        "first": 0,
+        "last": 90
+      },
+      "JointB1": {
+        "count": 5,
+        "first": 0,
+        "last": 90
+      },
+      "JointB2": {
+        "count": 5,
+        "first": 0,
+        "last": 90
+      },
+      "JointB3": {
+        "count": 5,
+        "first": 0,
+        "last": 90
+      },
+      "hardpointA": {
+        "count": 3,
+        "first": 0,
+        "last": 90
+      },
+      "hardpointB": {
+        "count": 3,
+        "first": 0,
+        "last": 90
+      },
+      "センター": {
+        "count": 5,
+        "first": 0,
+        "last": 90
+      }
+    },
+    "file": "test.vmd",
+    "sha256": "fcf43b67728743b26ae7f63aa053395db038501fd3992b749aec812d79d824fe"
+  },
+  {
+    "model": "Alex_arm",
+    "key_count": 15,
+    "bones": {
+      "body": {
+        "count": 3,
+        "first": 0,
+        "last": 90
+      },
+      "left arm": {
+        "count": 3,
+        "first": 0,
+        "last": 90
+      },
+      "left leg": {
+        "count": 3,
+        "first": 0,
+        "last": 90
+      },
+      "right arm": {
+        "count": 3,
+        "first": 0,
+        "last": 90
+      },
+      "right leg": {
+        "count": 3,
+        "first": 0,
+        "last": 90
+      }
+    },
+    "file": "test_pl.vmd",
+    "sha256": "a712552ca6d2d5b8f94c3c0ee9671afde1221b1989304019c25e9eb4ba12657b"
+  }
+]
