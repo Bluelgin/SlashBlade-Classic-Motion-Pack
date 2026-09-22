@@ -37,7 +37,7 @@ Player bodies for every row use the separately documented vanilla-pose adapter, 
 | Guard / A1_END2 | Shared A1 recovery; old ProjectileBarrier uses Java-driven rotations/effects, not an independent compatible clip | APPROXIMATE |
 | Idle | Old None placement; underlying modern vanilla body | REMAP |
 | Draw | SIai at A3; source says earlier ground attacks are saya strikes | APPROXIMATE |
-| Sheathe | Old Noutou plus short recovery bridges; saya-only return is an adapted bridge | APPROXIMATE |
+| Sheathe / timeout | Source-timed moves now follow r32 state transitions: saya and SlashDim/Iai/SIai reset to None; other blade moves enter Noutou and restart the six-tick vanilla swing | REMAP / APPROXIMATE by shared slot |
 | Sprint/air movement | Existing modern body and entity movement | IMPOSSIBLE_RESOURCE_PACK_ONLY |
 | Piercing | Modern blade asset unchanged; old Stinger is only a researched future candidate | APPROXIMATE (not restored) |
 | Damage, impacts, invulnerability, cancel windows, entity velocity | Java state/action callbacks | IMPOSSIBLE_RESOURCE_PACK_ONLY |
@@ -56,24 +56,51 @@ The pack therefore chooses `SIai` for the shared A3 window. This gives the power
 
 It is also a better temporal fit for modern A3 than the previous Battou candidate: modern A3 performs two timeline slash actions, while old `SIai` uses the draw-and-return progress curve (`0 → 1 → 0`) during one swing. The regular A4 branch then continues visually with `SSlashEdge` but ends early; that is explicitly an approximation, not a claim that modern power state equals old Stylish Rank.
 
-### Classic reset clocks
+## Classic reset clocks and timeout targets
 
-The visible old swing is still sampled on the vanilla six-tick swing curve; `comboResetTicks` is a separate state timeout. Earlier candidates let several modern END states hold the final legacy pose far beyond that old timeout, especially A4 EX and A5. That made the blade feel suspended after the hit.
+The visible old swing is sampled on the vanilla six-tick swing curve; `comboResetTicks` is a separate state timeout. Earlier candidates let modern END states hold a completed legacy pose far beyond that old timeout. That was especially visible on A4 EX/A5 and made the weapon feel suspended after the hit.
 
-For the ground chain the bake now converts the pinned r32 timeout with `30 VMD fps / 20 game tps` and begins recovery from the corresponding legacy move clock. For embedded A4 EX, the final `SReturnEdge` starts at frame 817 and owns the timeout. For moves delayed to modern hit timing (A4 and A5), the old timeout starts when the legacy visual clip starts, not when the modern atlas slot begins.
+For source-timed slots the bake converts the pinned r32 timeout with `30 VMD fps / 20 game tps`. Delayed mappings start that clock when the mapped legacy move starts, not when the modern atlas slot starts. Compound slots use the final embedded move: A4 EX therefore times recovery from `SReturnEdge` at frame 817, and Cleave/Sakura-left from the embedded `Kiriorosi` at frame 1818.
 
-The resulting recovery points are A1 **31**, A2 **130**, A3 **218**, A4 **546**, A4 EX **855**, and A5 **956**. These values are generated/validated from `legacy_motion_map.json`; changing the pinned reset ticks without updating the declared bake points fails the tests. The A3 12-tick reset still lands exactly on Resharped's frame-218 state boundary.
+The resulting source-derived timeout frames are:
+
+| Family | Timeout frame | r32 move owning the clock |
+|---|---:|---|
+| A1 | 31 | Saya1 |
+| A2 | 130 | Saya2 |
+| A3 / Sakura right | 218 | SIai |
+| C / Drive horizontal | 418 | Battou |
+| A4 | 546 | SSlashEdge |
+| B / Circle | 763 | final SSlashBlade segment |
+| A4 EX | 855 | SReturnEdge |
+| A5 | 956 | SSlashBlade |
+| Aerial A2 | 1238 | AKiriorosi |
+| Aerial A3 | 1338 | AKiriorosiFinish |
+| Aerial B3 | 1438 | AKiriorosiB |
+| Aerial B4 | 1518 | AKiriage |
+| Upper / Drive vertical / Wave Edge | 1630 | Kiriage |
+| Cleave / Sakura left | 1836 | Kiriorosi |
+| Judgement Cut | 1935 | SlashDim |
+| Rapid Slash | 2018 | RapidSlash |
+| Rising Star | 2118 | RisingStar |
+| Void Slash | 2212 | SlashDim |
+
+`ItemSlashBlade.onUpdate` also distinguishes what happens **after** that timeout. `Saya1`/`Saya2` and `SlashDim`/`Iai`/`SIai` reset directly to `None`; they do not play a made-up sheathe clip. Other mapped non-saya moves transition to `Noutou` and call `doSwingItem`, so the bake starts the old Noutou pose immediately and gives it one fresh six-tick / nine-VMD-frame swing before returning to neutral.
+
+This matters for the current ground chain: A3/SIai now becomes neutral at frame 218 instead of incorrectly entering Noutou, while A4/A4 EX/A5 still perform the classic Noutou timeout path. Judgement Cut and Void Slash likewise reset directly from SlashDim to neutral.
+
+Aerial A1 and Upper jump are deliberately excluded from `legacy_reset`: their Resharped atlas windows end before the corresponding r32 reset clock can fit. They remain explicit resource-pack timing approximations rather than silently claiming a clamped timeout is exact.
 
 ## Shared-slot decisions
 
-- A1_END2 replays 21–41 and therefore necessarily sees the later A1 recovery beginning at frame 31; frames 21–30 deliberately hold the completed classic Saya1 pose.
-- B2–B7 share 710 onward; Circle starts at 725. The candidate samples repeated SSlashBlade motions at those entry points so they do not become static holds. Reset jumps are possible and need runtime refinement.
-- Sakura right uses A3 subranges, with finish extending to 314; because it shares A3's atlas region it also receives the SIai candidate. This is a deliberate shared-slot compromise.
-- Sakura left and Aerial Cleave landing share 1816–1859. The loop 1812–1817 stays held; a Kiriorosi approximation begins at 1818. This does not recreate two independent moves.
-- Horizontal Drive shares C; Vertical Drive and Wave Edge share Upper Slash. Their projectiles remain Java-driven.
-- Judgement's actual slash window begins at 1923, so the SlashDim swing is placed there, not in the preparation window. This one five-frame slot compresses the visual; non-unit speed timeout transitions remain a limitation.
+- A1_END2 replays 21–41 and therefore sees A1's r32 timeout at frame 31. Frames 31 onward are neutral, matching the old saya-state reset rather than reversing the saya curve.
+- B2–B7 share 710 onward; Circle starts at 725. Repeated SSlashBlade samples remain a compromise, but the final shared segment now uses its r32 reset clock at frame 763 before entering Noutou.
+- Sakura right uses A3 subranges, with finish extending to 314; because it shares A3's atlas region it also receives SIai and the direct-to-None timeout at frame 218. This is a deliberate shared-slot compromise.
+- Sakura left and Aerial Cleave landing share 1816–1859. The loop 1812–1817 stays held; a Kiriorosi approximation begins at 1818 and owns the source reset at 1836. This does not recreate two independent moves.
+- Horizontal Drive shares C; Vertical Drive and Wave Edge share Upper Slash. Their projectiles remain Java-driven even though the visual timeout is source-timed.
+- Judgement's actual slash window begins at 1923, so SlashDim is placed there rather than in the preparation window. Its r32 eight-tick timeout lands at 1935 and resets directly to None. The five-frame modern swing window still compresses the visual.
 - Normal A4 does not lead directly to A5. The powered branch uses A4_EX → A5; testing must exercise both.
 
 ## Milestone state
 
-A1 blade/saya data is implemented and statically verified in the modern window. A1–A5 candidates are generated. These are not runtime-accepted milestones. The specifically requested recovered A1 skeletal player clip cannot be asserted because the identified official legacy source does not contain one; the current body solution is explicitly an approximation. No complete move is claimed 100% restored.
+A1 blade/saya data is implemented and statically verified in the modern window. A1–A5 candidates, air candidates and major special-action candidates are generated. Source timing and timeout-state behavior are now guarded by tests, but runtime acceptance still depends on Minecraft testing. The specifically requested recovered skeletal player clips cannot be asserted because the identified official legacy source does not contain them; the current body solution is explicitly an approximation. No complete move is claimed 100% restored.
