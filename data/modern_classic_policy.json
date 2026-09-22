@@ -1,0 +1,90 @@
+{
+  "schema": 1,
+  "resource": "slashblade:combostate/motion.vmd",
+  "principle": "Restore an r32 move when a direct classic semantic exists. For modern semantic families, preserve the modern gameplay/state structure while expressing the visible blade/saya motion with r32 motion language. Shared atlas regions must use one compatible compromise because a resource pack cannot branch on runtime ComboState.",
+  "policies": {
+    "CLASSIC_RESTORATION": "Direct r32 move family sampled into a compatible modern window. Timing or mesh differences may still make the result REMAP/APPROXIMATE rather than exact.",
+    "SHARED_SLOT_INTERPRETATION": "Modern semantic family shares two or more VMD frames with another move family, so one classic-style motion must serve all consumers.",
+    "INDEPENDENT_INTERPRETATION": "Modern semantic family owns a dedicated VMD region and can receive a purpose-built classic-style sequence without changing another move family.",
+    "JAVA_ONLY": "Behavior is selected or executed by runtime Java and cannot be independently restored by an ordinary resource pack."
+  },
+  "families": [
+    {
+      "name": "sakura_right_ground",
+      "policy": "SHARED_SLOT_INTERPRETATION",
+      "modern_ids": ["slashblade:sakura_end_right", "slashblade:sakura_end_finish", "slashblade:sakura_end_finish2"],
+      "shared_with": ["slashblade:combo_a3", "slashblade:combo_a3_end", "slashblade:combo_a3_end2", "slashblade:combo_a3_end3"],
+      "bake_slots": ["A3 / Sakura right"],
+      "classic_anchors": ["SIai"],
+      "reason": "The Sakura ground sequence occupies the A3 atlas region, so it cannot receive a separate resource-only clip."
+    },
+    {
+      "name": "sakura_left_ground",
+      "policy": "SHARED_SLOT_INTERPRETATION",
+      "modern_ids": ["slashblade:sakura_end_left"],
+      "shared_with": ["slashblade:aerial_cleave_landing"],
+      "bake_slots": ["Cleave / Sakura left"],
+      "classic_anchors": ["HelmBraker", "Kiriorosi"],
+      "reason": "The Sakura-left window is the same landing region used by Aerial Cleave."
+    },
+    {
+      "name": "sakura_right_air",
+      "policy": "SHARED_SLOT_INTERPRETATION",
+      "modern_ids": ["slashblade:sakura_end_right_air", "slashblade:sakura_end_finish_air", "slashblade:sakura_end_finish2_air"],
+      "shared_with": ["slashblade:aerial_rave_a2", "slashblade:aerial_rave_a2_end", "slashblade:aerial_rave_a2_end2"],
+      "bake_slots": ["Aerial A2 / Sakura right air"],
+      "classic_anchors": ["AKiriorosi"],
+      "reason": "The airborne Sakura-right sequence exactly reuses the Aerial A2 atlas family."
+    },
+    {
+      "name": "sakura_left_air",
+      "policy": "SHARED_SLOT_INTERPRETATION",
+      "modern_ids": ["slashblade:sakura_end_left_air"],
+      "shared_with": ["slashblade:aerial_rave_a3"],
+      "bake_slots": ["Aerial A3 / Sakura left air"],
+      "classic_anchors": ["AKiriorosiFinish"],
+      "reason": "The airborne Sakura-left attack reuses Aerial A3 frames."
+    },
+    {
+      "name": "drive_horizontal",
+      "policy": "SHARED_SLOT_INTERPRETATION",
+      "modern_ids": ["slashblade:drive_horizontal", "slashblade:drive_horizontal_end"],
+      "shared_with": ["slashblade:combo_c", "slashblade:combo_c_end"],
+      "bake_slots": ["C / Drive horizontal"],
+      "classic_anchors": ["Battou"],
+      "reason": "Drive Horizontal consumes the same complete atlas region as Combo C."
+    },
+    {
+      "name": "drive_vertical",
+      "policy": "SHARED_SLOT_INTERPRETATION",
+      "modern_ids": ["slashblade:drive_vertical", "slashblade:drive_vertical_end"],
+      "shared_with": ["slashblade:upperslash", "slashblade:upperslash_end"],
+      "bake_slots": ["Upper / Drive vertical / Wave Edge"],
+      "classic_anchors": ["Kiriage"],
+      "reason": "Drive Vertical is a second semantic consumer of the Upper Slash atlas family."
+    },
+    {
+      "name": "wave_edge_vertical",
+      "policy": "SHARED_SLOT_INTERPRETATION",
+      "modern_ids": ["slashblade:wave_edge_vertical"],
+      "shared_with": ["slashblade:upperslash", "slashblade:drive_vertical"],
+      "bake_slots": ["Upper / Drive vertical / Wave Edge"],
+      "classic_anchors": ["Kiriage"],
+      "reason": "Wave Edge Vertical starts from the same Upper/Drive Vertical motion region; projectile behavior remains Java-driven."
+    },
+    {
+      "name": "void_slash",
+      "policy": "INDEPENDENT_INTERPRETATION",
+      "modern_ids": ["slashblade:void_slash", "slashblade:void_slash_sheath"],
+      "shared_with": [],
+      "bake_slots": ["Void Slash", "Void Slash sheath"],
+      "classic_anchors": ["SlashDim", "Noutou"],
+      "reason": "Frames 2200-2299 are a dedicated modern family. The attack keeps SlashDim-like compression while the separate modern sheath state is interpreted with a short classic Noutou gesture."
+    }
+  ],
+  "java_only": [
+    {"name": "runtime_combo_branching", "policy": "JAVA_ONLY", "examples": ["powered/unpowered A3 continuation", "rank/timing-dependent r32 Saya2 branch"]},
+    {"name": "combat_resolution", "policy": "JAVA_ONLY", "examples": ["damage", "hitboxes", "invulnerability", "cancel windows", "entity velocity"]},
+    {"name": "projectile_and_effect_logic", "policy": "JAVA_ONLY", "examples": ["Drive/Wave Edge projectile spawn", "target logic", "dynamic barrier/trail behavior"]}
+  ]
+}
