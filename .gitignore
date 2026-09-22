@@ -2,3 +2,9 @@ __pycache__/
 *.pyc
 .cache/
 dist/
+
+# `pack/` is a generated build staging directory. Keep only its static
+# Minecraft metadata in Git; build_pack.py regenerates every runtime asset,
+# icon and copied notice/readme before validation and packaging.
+pack/*
+!pack/pack.mcmeta
