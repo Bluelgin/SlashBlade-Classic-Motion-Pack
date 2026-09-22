@@ -56,11 +56,17 @@ The pack therefore chooses `SIai` for the shared A3 window. This gives the power
 
 It is also a better temporal fit for modern A3 than the previous Battou candidate: modern A3 performs two timeline slash actions, while old `SIai` uses the draw-and-return progress curve (`0 → 1 → 0`) during one swing. The regular A4 branch then continues visually with `SSlashEdge` but ends early; that is explicitly an approximation, not a claim that modern power state equals old Stylish Rank.
 
-The A3 classic 12-tick reset window still lands exactly on Resharped's frame-218 A3 state boundary (30 VMD frames / 20 game ticks), so changing the source motion does not invalidate the established recovery boundary.
+### Classic reset clocks
+
+The visible old swing is still sampled on the vanilla six-tick swing curve; `comboResetTicks` is a separate state timeout. Earlier candidates let several modern END states hold the final legacy pose far beyond that old timeout, especially A4 EX and A5. That made the blade feel suspended after the hit.
+
+For the ground chain the bake now converts the pinned r32 timeout with `30 VMD fps / 20 game tps` and begins recovery from the corresponding legacy move clock. For embedded A4 EX, the final `SReturnEdge` starts at frame 817 and owns the timeout. For moves delayed to modern hit timing (A4 and A5), the old timeout starts when the legacy visual clip starts, not when the modern atlas slot begins.
+
+The resulting recovery points are A1 **31**, A2 **130**, A3 **218**, A4 **546**, A4 EX **855**, and A5 **956**. These values are generated/validated from `legacy_motion_map.json`; changing the pinned reset ticks without updating the declared bake points fails the tests. The A3 12-tick reset still lands exactly on Resharped's frame-218 state boundary.
 
 ## Shared-slot decisions
 
-- A1_END2 replays 21–41 and therefore necessarily sees A1 recovery.
+- A1_END2 replays 21–41 and therefore necessarily sees the later A1 recovery beginning at frame 31; frames 21–30 deliberately hold the completed classic Saya1 pose.
 - B2–B7 share 710 onward; Circle starts at 725. The candidate samples repeated SSlashBlade motions at those entry points so they do not become static holds. Reset jumps are possible and need runtime refinement.
 - Sakura right uses A3 subranges, with finish extending to 314; because it shares A3's atlas region it also receives the SIai candidate. This is a deliberate shared-slot compromise.
 - Sakura left and Aerial Cleave landing share 1816–1859. The loop 1812–1817 stays held; a Kiriorosi approximation begins at 1818. This does not recreate two independent moves.
