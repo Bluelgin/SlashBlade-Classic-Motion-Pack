@@ -8,6 +8,7 @@ from scripts.generate_motions import (
     generate,
     last_legacy_move,
     legacy_reset_frames,
+    noutou_state_frames,
     resolve_recovery,
     timeout_target,
 )
@@ -52,7 +53,12 @@ class TimeoutSemanticsTests(unittest.TestCase):
             'Judgement Cut': 1935,
             'Rapid Slash': 2018,
             'Rising Star': 2118,
-            'Void Slash': 2212,
+            # Void's legacy SlashDim clock starts at the modern tick-16 release:
+            # 16 ticks * 30/20 = 24 VMD frames, then 8 old reset ticks = 12 frames.
+            'Void Slash': 2236,
+            # Old Noutou is entered with LastActionTime=currentTime+5, so its own
+            # five-tick reset clock expires ten ticks after entry on the server clock.
+            'Void Slash sheath': 2293,
         }
         for name, frame in expected.items():
             slot = self.by_name[name]
@@ -60,7 +66,10 @@ class TimeoutSemanticsTests(unittest.TestCase):
             legacy_name, origin = last_legacy_move(slot)
             calculated = min(
                 slot['end'],
-                origin + legacy_reset_frames(self.combos[legacy_name]),
+                origin + legacy_reset_frames(
+                    self.combos[legacy_name],
+                    slot.get('legacy_entry_delay_ticks', 0),
+                ),
             )
             self.assertEqual(calculated, frame, name)
             self.assertEqual(slot['recovery_start'], frame, name)
@@ -71,16 +80,23 @@ class TimeoutSemanticsTests(unittest.TestCase):
         self.assertNotEqual(self.by_name['Aerial A1'].get('recovery_mode'), 'legacy_reset')
         self.assertNotEqual(self.by_name['Upper jump'].get('recovery_mode'), 'legacy_reset')
 
+    def test_void_slash_release_is_aligned_to_modern_java_tick_16(self):
+        slot = self.by_name['Void Slash']
+        self.assertEqual(slot['attack_offset'], 24)
+        self.assertEqual(slot['start'] + slot['attack_offset'], 2224)
+        self.assertEqual(slot['recovery_start'], 2236)
+
     def test_r32_timeout_targets_are_not_all_noutou(self):
         # r32 ItemSlashBlade.onUpdate resets scabbard moves and the
         # SlashDim/Iai/SIai family directly to None. Other mapped blade moves
-        # enter Noutou and restart the vanilla swing.
+        # enter Noutou and restart the vanilla swing. Noutou itself ends at None.
         direct_none = {
             'A1',
             'A2',
             'A3 / Sakura right',
             'Judgement Cut',
             'Void Slash',
+            'Void Slash sheath',
         }
         noutou = {
             'C / Drive horizontal',
@@ -116,7 +132,8 @@ class TimeoutSemanticsTests(unittest.TestCase):
                 'A4': ('noutou', 546),
                 'Judgement Cut': ('none', 1935),
                 'Rapid Slash': ('noutou', 2018),
-                'Void Slash': ('none', 2212),
+                'Void Slash': ('none', 2236),
+                'Void Slash sheath': ('none', 2293),
             }
             for slot_name, (target, frame) in samples.items():
                 self.assertEqual(reported[slot_name]['timeout_target'], target)
@@ -133,14 +150,30 @@ class TimeoutSemanticsTests(unittest.TestCase):
                         f'{slot_name} {bone} frame={frame}',
                     )
 
-            # A4's Noutou state is a fresh vanilla six-tick swing. The bake keeps
-            # it for nine 30-Hz frames and then becomes neutral.
-            neutral_frame = 546 + VANILLA_SWING_FRAMES
+            # A4 enters a fresh Noutou swing at frame 546. The six-tick swing
+            # reaches its final pose after nine VMD frames, but r32 keeps the
+            # Noutou state alive because entry moved LastActionTime five ticks
+            # into the future. Hold the final Noutou pose until the combined
+            # ten-tick source clock expires, then become neutral.
+            final_swing_frame = 546 + VANILLA_SWING_FRAMES
+            neutral_frame = 546 + noutou_state_frames(self.combos)
+            self.assertEqual(noutou_state_frames(self.combos), 15)
+            self.assertEqual(reported['A4']['neutral'], neutral_frame)
             for bone, sheath in (('hardpointA', False), ('hardpointB', True)):
+                self.assert_key_pose(
+                    keys[(bone, final_swing_frame)],
+                    pose(self.combos['Noutou'], 1, sheath),
+                    f'A4 {bone} final Noutou swing frame={final_swing_frame}',
+                )
+                self.assert_key_pose(
+                    keys[(bone, neutral_frame - 1)],
+                    pose(self.combos['Noutou'], 1, sheath),
+                    f'A4 {bone} Noutou hold frame={neutral_frame - 1}',
+                )
                 self.assert_key_pose(
                     keys[(bone, neutral_frame)],
                     pose(self.combos['None'], 0, sheath),
-                    f'A4 {bone} frame={neutral_frame}',
+                    f'A4 {bone} neutral frame={neutral_frame}',
                 )
 
 
