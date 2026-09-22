@@ -1,0 +1,280 @@
+{
+  "commit": "ba1ef8604c0971f68336b882b42a868df7f32f0b",
+  "minecraft": "1.12.2",
+  "version": "mc1.12-r32",
+  "representation": "procedural; no legacy VMD",
+  "entries": [
+    {
+      "name": "None",
+      "scabbard": true,
+      "amplitude": 0.0,
+      "direction": 0.0,
+      "charged": false,
+      "reset_ticks": 0
+    },
+    {
+      "name": "Saya1",
+      "scabbard": true,
+      "amplitude": 200.0,
+      "direction": 5.0,
+      "charged": false,
+      "reset_ticks": 20
+    },
+    {
+      "name": "Saya2",
+      "scabbard": true,
+      "amplitude": -200.0,
+      "direction": 5.0,
+      "charged": false,
+      "reset_ticks": 20
+    },
+    {
+      "name": "Battou",
+      "scabbard": false,
+      "amplitude": 240.0,
+      "direction": 0.0,
+      "charged": false,
+      "reset_ticks": 12
+    },
+    {
+      "name": "Noutou",
+      "scabbard": false,
+      "amplitude": -210.0,
+      "direction": 10.0,
+      "charged": false,
+      "reset_ticks": 5
+    },
+    {
+      "name": "Kiriage",
+      "scabbard": false,
+      "amplitude": 260.0,
+      "direction": 70.0,
+      "charged": false,
+      "reset_ticks": 20
+    },
+    {
+      "name": "Kiriorosi",
+      "scabbard": false,
+      "amplitude": -260.0,
+      "direction": 90.0,
+      "charged": false,
+      "reset_ticks": 12
+    },
+    {
+      "name": "SlashDim",
+      "scabbard": false,
+      "amplitude": -220.0,
+      "direction": 10.0,
+      "charged": true,
+      "reset_ticks": 8
+    },
+    {
+      "name": "Iai",
+      "scabbard": false,
+      "amplitude": 240.0,
+      "direction": 0.0,
+      "charged": false,
+      "reset_ticks": 20
+    },
+    {
+      "name": "HiraTuki",
+      "scabbard": false,
+      "amplitude": 180.0,
+      "direction": 180.0,
+      "charged": false,
+      "reset_ticks": 20
+    },
+    {
+      "name": "SlashEdge",
+      "scabbard": false,
+      "amplitude": 240.0,
+      "direction": 20.0,
+      "charged": false,
+      "reset_ticks": 12
+    },
+    {
+      "name": "ReturnEdge",
+      "scabbard": false,
+      "amplitude": 250.0,
+      "direction": -160.0,
+      "charged": false,
+      "reset_ticks": 12
+    },
+    {
+      "name": "SIai",
+      "scabbard": false,
+      "amplitude": 240.0,
+      "direction": 0.0,
+      "charged": false,
+      "reset_ticks": 12
+    },
+    {
+      "name": "SSlashEdge",
+      "scabbard": false,
+      "amplitude": 240.0,
+      "direction": 20.0,
+      "charged": false,
+      "reset_ticks": 25
+    },
+    {
+      "name": "SReturnEdge",
+      "scabbard": false,
+      "amplitude": 250.0,
+      "direction": -160.0,
+      "charged": false,
+      "reset_ticks": 25
+    },
+    {
+      "name": "SSlashBlade",
+      "scabbard": false,
+      "amplitude": 200.0,
+      "direction": -315.0,
+      "charged": false,
+      "reset_ticks": 25
+    },
+    {
+      "name": "AerialRave",
+      "scabbard": false,
+      "amplitude": 240.0,
+      "direction": 20.0,
+      "charged": false,
+      "reset_ticks": 25
+    },
+    {
+      "name": "ASlashEdge",
+      "scabbard": false,
+      "amplitude": 240.0,
+      "direction": 20.0,
+      "charged": false,
+      "reset_ticks": 25
+    },
+    {
+      "name": "AKiriorosi",
+      "scabbard": false,
+      "amplitude": 200.0,
+      "direction": -240.0,
+      "charged": false,
+      "reset_ticks": 25
+    },
+    {
+      "name": "AKiriorosiB",
+      "scabbard": false,
+      "amplitude": 200.0,
+      "direction": -280.0,
+      "charged": false,
+      "reset_ticks": 25
+    },
+    {
+      "name": "AKiriage",
+      "scabbard": false,
+      "amplitude": 240,
+      "direction": -70.0,
+      "charged": false,
+      "reset_ticks": 12
+    },
+    {
+      "name": "AKiriorosiFinish",
+      "scabbard": false,
+      "amplitude": 200.0,
+      "direction": -270.0,
+      "charged": false,
+      "reset_ticks": 25
+    },
+    {
+      "name": "RapidSlash",
+      "scabbard": false,
+      "amplitude": 600.0,
+      "direction": -380.0,
+      "charged": false,
+      "reset_ticks": 12
+    },
+    {
+      "name": "RapidSlashEnd",
+      "scabbard": false,
+      "amplitude": 240.0,
+      "direction": 20.0,
+      "charged": false,
+      "reset_ticks": 12
+    },
+    {
+      "name": "RisingStar",
+      "scabbard": false,
+      "amplitude": 250.0,
+      "direction": -160.0,
+      "charged": false,
+      "reset_ticks": 12
+    },
+    {
+      "name": "HelmBraker",
+      "scabbard": false,
+      "amplitude": 200.0,
+      "direction": -270.0,
+      "charged": false,
+      "reset_ticks": 25
+    },
+    {
+      "name": "Calibur",
+      "scabbard": false,
+      "amplitude": 600.0,
+      "direction": -380.0,
+      "charged": false,
+      "reset_ticks": 25
+    },
+    {
+      "name": "Force1",
+      "scabbard": false,
+      "amplitude": 300.0,
+      "direction": -230.0,
+      "charged": false,
+      "reset_ticks": 25
+    },
+    {
+      "name": "Force2",
+      "scabbard": false,
+      "amplitude": 250.0,
+      "direction": -30.0,
+      "charged": false,
+      "reset_ticks": 25
+    },
+    {
+      "name": "Force3",
+      "scabbard": true,
+      "amplitude": 200.0,
+      "direction": 5.0,
+      "charged": false,
+      "reset_ticks": 20
+    },
+    {
+      "name": "Force4",
+      "scabbard": true,
+      "amplitude": -200.0,
+      "direction": 5.0,
+      "charged": false,
+      "reset_ticks": 20
+    },
+    {
+      "name": "Force5",
+      "scabbard": false,
+      "amplitude": 240.0,
+      "direction": 0.0,
+      "charged": false,
+      "reset_ticks": 12
+    },
+    {
+      "name": "Force6",
+      "scabbard": false,
+      "amplitude": 200.0,
+      "direction": -270.0,
+      "charged": false,
+      "reset_ticks": 25
+    },
+    {
+      "name": "Stinger",
+      "scabbard": false,
+      "amplitude": 180.0,
+      "direction": 180.0,
+      "charged": false,
+      "reset_ticks": 20
+    }
+  ]
+}

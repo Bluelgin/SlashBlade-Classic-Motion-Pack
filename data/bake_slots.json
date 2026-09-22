@@ -1,0 +1,25 @@
+{
+  "notes": "Source-derived blade poses. Modern semantics and recovery bridges remain approximations. No r32 skeletal VMD exists.",
+  "slots": [
+    {"name":"A1","start":1,"end":41,"recovery_start":21,"legacy":"Saya1","status":"REMAP"},
+    {"name":"A2","start":100,"end":151,"recovery_start":132,"legacy":"Saya2","status":"REMAP"},
+    {"name":"A3 / Sakura right","start":200,"end":314,"recovery_start":281,"legacy":"Battou","status":"APPROXIMATE"},
+    {"name":"C / Drive horizontal","start":400,"end":488,"recovery_start":459,"legacy":"Battou","status":"APPROXIMATE"},
+    {"name":"A4","start":500,"end":608,"recovery_start":576,"legacy":"SSlashEdge","attack_offset":8,"status":"APPROXIMATE"},
+    {"name":"B / Circle","start":700,"end":787,"recovery_start":764,"legacy":"SSlashBlade","segments":[{"start":710,"legacy":"SSlashBlade"},{"start":725,"legacy":"SSlashBlade"}],"status":"APPROXIMATE"},
+    {"name":"A4 EX","start":800,"end":894,"recovery_start":877,"legacy":"SSlashEdge","attack_offset":6,"second_legacy":"SReturnEdge","second_start":817,"status":"APPROXIMATE"},
+    {"name":"A5","start":900,"end":1061,"recovery_start":1013,"legacy":"SSlashBlade","attack_offset":18,"status":"APPROXIMATE"},
+    {"name":"Aerial A1","start":1100,"end":1132,"recovery_start":1122,"legacy":"ASlashEdge","status":"REMAP"},
+    {"name":"Aerial A2 / Sakura right air","start":1200,"end":1241,"recovery_start":1231,"legacy":"AKiriorosi","status":"REMAP"},
+    {"name":"Aerial A3 / Sakura left air","start":1300,"end":1338,"recovery_start":1328,"legacy":"AKiriorosiFinish","status":"REMAP"},
+    {"name":"Aerial B3","start":1400,"end":1443,"recovery_start":1437,"legacy":"AKiriorosiB","status":"REMAP"},
+    {"name":"Aerial B4","start":1500,"end":1547,"recovery_start":1537,"legacy":"AKiriage","status":"REMAP"},
+    {"name":"Upper / Drive vertical / Wave Edge","start":1600,"end":1693,"recovery_start":1659,"legacy":"Kiriage","status":"REMAP"},
+    {"name":"Upper jump","start":1700,"end":1717,"recovery_start":1717,"legacy":"Kiriage","status":"APPROXIMATE"},
+    {"name":"Cleave / Sakura left","start":1800,"end":1886,"recovery_start":1859,"legacy":"HelmBraker","segments":[{"start":1818,"legacy":"Kiriorosi"}],"status":"APPROXIMATE"},
+    {"name":"Judgement Cut","start":1900,"end":1963,"recovery_start":1928,"legacy":"SlashDim","attack_offset":23,"swing_frames":5,"status":"REMAP"},
+    {"name":"Rapid Slash","start":2000,"end":2073,"recovery_start":2054,"legacy":"RapidSlash","status":"REMAP"},
+    {"name":"Rising Star","start":2100,"end":2147,"recovery_start":2137,"legacy":"RisingStar","status":"REMAP"},
+    {"name":"Void Slash","start":2200,"end":2299,"recovery_start":2278,"legacy":"SlashDim","status":"APPROXIMATE"}
+  ]
+}
