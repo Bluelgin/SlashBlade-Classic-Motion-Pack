@@ -27,7 +27,7 @@ Record exact Resharped JAR version/hash, Forge version, dependency versions, pac
 | Wave Edge | NOT RUN | verify restored prism orientation and scale |
 | Guard recovery | NOT RUN | |
 | Idle / draw / sheath | NOT RUN | |
-| Piercing regression | NOT RUN | |
+| Piercing / Piercing Just | NOT RUN | generated Stinger interpretation + passthrough player VMD; verify modern lunge alignment |
 
 For every move:
 
@@ -48,7 +48,7 @@ For every move:
 
 The first-person runtime check has two different goals and must not mix them:
 
-- **Shared motion acceptance:** verify the classic VMD-driven blade/saya motion reads correctly from the camera during A1–A5, air moves, Rapid/Rising, Judgement, Void and sheath recovery. This is part of the phase-one candidate.
+- **Shared motion acceptance:** verify the classic VMD-driven blade/saya motion reads correctly from the camera during A1–A5, air moves, Rapid/Rising, Judgement, Void, Piercing and sheath recovery. This is part of the phase-one candidate.
 - **Renderer-wrapper comparison:** record the visual difference between r32's `FPVOldStryleLike` camera-relative hold and Resharped's hard-coded wrapper. This is evidence for the documented ceiling, not a tuning request for `models/item/slashblade.json`.
 
 Specific checks:
@@ -59,6 +59,20 @@ Specific checks:
 - [ ] Test looking sharply up/down. Resharped uses its own pitch handling; note any uncomfortable camera-relative drift separately from VMD motion errors.
 - [ ] Test Projectile Barrier. Do not expect r32's special first-person branch: that branch is Java-only and `IMPOSSIBLE_RESOURCE_PACK_ONLY` in phase one.
 - [ ] Do not introduce a global model/PMD/VMD offset merely to improve FPV if it worsens third-person weapon placement.
+
+## Piercing pass
+
+Piercing is now a dedicated resource-only Classic Interpretation rather than an upstream fallback. Its binary timing is source-checked; runtime alignment is still visual work:
+
+- [ ] Frames 1–32 read as a stable classic neutral preparation rather than a broken/frozen modern clip.
+- [ ] At the modern lunge start (frame 33), the blade snaps into the r32 `Stinger` full-thrust pose at the same moment the Java movement begins.
+- [ ] During the first three lunge ticks, the Stinger blade direction agrees with player travel instead of appearing sideways/backwards.
+- [ ] `piercing_just` beginning at frame 34 still reads correctly when entering one frame after the main active-state boundary.
+- [ ] At frame 63, the old 20-tick Stinger reset clock begins `Noutou`; the transition is not an obvious teleport.
+- [ ] The modern quick-sheath sound at frame 65 lands plausibly during the generated Noutou gesture.
+- [ ] By frame 72 the blade/saya are back at the r32 neutral pose and remain stable through frame 90.
+- [ ] The generated `piercing_pl.vmd` passthrough leaves the body readable during the Java lunge; no modern full-body Piercing pose should reappear from another pack with higher priority.
+- [ ] Do not attribute forward distance, area hit, just-window timing or cancel behavior to this pack. Those remain Resharped Java.
 
 ## Classic trail / effect pass
 
