@@ -1,0 +1,48 @@
+{
+  "schema": 1,
+  "target": {
+    "repository": "0999312/SlashBlade_Resharped",
+    "commit": "6e2a0a092fb794d7ea56fd83452869674f3ab1c7",
+    "animation_file": "src/main/java/mods/flammpfeil/slashblade/compat/playerAnim/VmdAnimation.java",
+    "overrider_file": "src/main/java/mods/flammpfeil/slashblade/compat/playerAnim/PlayerAnimationOverrider.java",
+    "pmd_resource": "slashblade:model/pa/alex.pmd",
+    "vmd_resource": "slashblade:model/pa/player_motion.vmd",
+    "player_model_names_queried": [
+      "body",
+      "head",
+      "leftArm",
+      "rightArm",
+      "leftLeg",
+      "rightLeg"
+    ],
+    "mapped_pmd_names": {
+      "leftArm": "left arm",
+      "rightArm": "right arm",
+      "leftLeg": "left leg",
+      "rightLeg": "right leg"
+    },
+    "missing_bone_behavior": "return_value0",
+    "motion_layer_index": 0,
+    "motion_layer_is_installed_on_blade_motion_event": true,
+    "pmd_is_static_lazy_cached": true
+  },
+  "pack_adapter": {
+    "pmd_bones": ["classic_root"],
+    "contains_any_player_model_bone": false,
+    "vmd_bones": ["classic_root"],
+    "purpose": "Keep Resharped's VmdAnimation active but force every queried player model bone lookup to miss, causing get3DTransform to return value0 unchanged.",
+    "classification": "RESOURCE_ONLY_PASSTHROUGH_ADAPTER"
+  },
+  "legacy": {
+    "repository": "flammpfeil/SlashBlade",
+    "commit": "ba1ef8604c0971f68336b882b42a868df7f32f0b",
+    "full_body_vmd_present": false,
+    "attack_body_identity": "vanilla swing/pose behavior plus SlashBlade's separately rendered blade/sheath layer"
+  },
+  "limitations": {
+    "recovered_r32_full_body_animation": "NOT_AVAILABLE_IN_SOURCE",
+    "exact_1_12_player_body_pose": "NOT_CLAIMED",
+    "other_animation_mod_layer_zero_compatibility": "UPSTREAM_RUNTIME_BEHAVIOR_NOT_RESOURCE_PACK_CONTROLLED",
+    "hot_reload_pmd": "NOT_RELIABLE_RESTART_REQUIRED"
+  }
+}
