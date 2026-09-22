@@ -10,9 +10,39 @@ from tools.vmd.legacy import pose
 from tools.vmd.transforms import slerp
 
 ROOT=Path(__file__).resolve().parents[1]
+VMD_FPS=30
+GAME_TPS=20
 
 def mix(a,b,t):
     return tuple(x+(y-x)*t for x,y in zip(a[0],b[0])),slerp(a[1],b[1],t)
+
+def legacy_reset_frames(combo):
+    """Convert r32 comboResetTicks to the 30 Hz VMD atlas clock."""
+    return round(combo['reset_ticks']*VMD_FPS/GAME_TPS)
+
+def last_legacy_move(slot):
+    if slot.get('segments'):
+        segment=slot['segments'][-1]
+        return segment['legacy'],segment['start']
+    if 'second_legacy' in slot:
+        return slot['second_legacy'],slot['second_start']
+    return slot['legacy'],slot['start']+slot.get('attack_offset',0)
+
+def resolve_recovery(slot,combos):
+    """Resolve the first recovery frame, optionally from the pinned r32 reset clock.
+
+    Embedded multi-move slots (currently A4 EX) use the final legacy move as the
+    recovery clock origin. This keeps the visible old move alive for its real
+    comboResetTicks instead of letting a much longer modern END state hold it.
+    """
+    if slot.get('recovery_mode')!='legacy_reset':
+        return slot['recovery_start']
+    name,origin=last_legacy_move(slot)
+    resolved=min(slot['end'],origin+legacy_reset_frames(combos[name]))
+    declared=slot.get('recovery_start')
+    if declared is not None and declared!=resolved:
+        raise ValueError(f"{slot['name']} recovery_start={declared}, expected legacy reset {resolved}")
+    return resolved
 
 def passthrough_pmd():
     # Bone-only PMD, no borrowed mesh. Unknown body-part names cause the existing
@@ -32,7 +62,7 @@ def generate(output):
     modern=json.loads((ROOT/'data/resharped_blade_frame_map.json').read_text())['entries']
     keys={};report=[]
     for slot in slots:
-        start,end=slot['start'],slot['end'];recovery=slot['recovery_start']
+        start,end=slot['start'],slot['end'];recovery=resolve_recovery(slot,combos)
         name=slot['legacy'];combo=combos[name]
         # The six-tick ordinary legacy swing is nine VMD frames at 30 Hz.
         # Long modern windows keep a hold; they do not stretch the slash.
@@ -67,7 +97,7 @@ def generate(output):
                         elif elapsed<bridge+swing:result=pose(combos['Noutou'],(elapsed-bridge)/swing,sheath)
                         else:result=idle
                 keys[(bone,f)]=Key(bone,f,*result)
-        report.append(dict(slot=slot['name'],legacy=name,frames=[start,end],status=slot['status']))
+        report.append(dict(slot=slot['name'],legacy=name,frames=[start,end],recovery=recovery,status=slot['status']))
     # Fill genuinely unused gaps with neutral pose. Never interpolate across slots.
     max_frame=max(r['end'] for r in modern if r['resource']=='slashblade:combostate/motion.vmd')
     for f in range(max_frame+1):
