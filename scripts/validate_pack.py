@@ -10,6 +10,7 @@ from tools.vmd.codec import decode
 ROOT=Path(__file__).resolve().parents[1]
 EXPECTED={'pack.mcmeta','pack.png','README.md','LICENSE','THIRD_PARTY_NOTICES.md',
           'assets/slashblade/combostate/motion.vmd',
+          'assets/slashblade/combostate/piercing.vmd','assets/slashblade/combostate/piercing_pl.vmd',
           'assets/slashblade/model/pa/player_motion.vmd','assets/slashblade/model/pa/alex.pmd',
           'assets/slashblade/model/util/slash.obj','assets/slashblade/model/util/slash.png',
           'assets/slashblade/model/util/drive.obj','assets/slashblade/model/util/ss.png'}
@@ -64,9 +65,7 @@ def validate(path):
         for r in rows:
             p='assets/'+r['resource'].replace(':','/')
             if p not in motions:
-                if r['resource'] not in ('slashblade:combostate/piercing.vmd','slashblade:combostate/piercing_pl.vmd'):
-                    raise ValueError(f'Missing overridden resource {p}')
-                continue  # Unmodified upstream resource, explicitly documented
+                raise ValueError(f'Missing overridden resource {p}')
             tracks=motions[p].tracks()
             required=('classic_root',) if kind=='player' else ('hardpointA','hardpointB')
             for bone in required:
@@ -77,6 +76,17 @@ def validate(path):
     for name in ('hardpointA','hardpointB'):
         a1=[k for k in blade[name] if 1<=k.frame<=10]
         if len({k.position+k.rotation for k in a1})<5:raise ValueError('A1 is static')
+
+    # Piercing has its own blade and player VMD contracts; both must be generated
+    # rather than silently falling back to the modern upstream clips.
+    piercing=motions['assets/slashblade/combostate/piercing.vmd'].tracks()
+    for name in ('hardpointA','hardpointB'):
+        if {k.frame for k in piercing[name]}!=set(range(91)):
+            raise ValueError(f'Piercing {name} does not cover 0..90')
+    piercing_player=motions['assets/slashblade/combostate/piercing_pl.vmd'].tracks()
+    if {k.frame for k in piercing_player.get('classic_root',[])}!=set(range(91)):
+        raise ValueError('Piercing player passthrough does not cover 0..90')
+
     # Validate the exact original, bone-only adapter, including the absence of
     # body-part names. This is not evidence of gameplay or body restoration.
     from scripts.generate_motions import passthrough_pmd
