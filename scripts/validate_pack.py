@@ -1,4 +1,4 @@
-"""Validate runtime structure, generated effects, VMD data, rig and pinned frame windows."""
+"""Validate runtime structure, effect policy, VMD data, rig and pinned frame windows."""
 import argparse
 import json
 from pathlib import Path
@@ -12,8 +12,7 @@ EXPECTED={'pack.mcmeta','pack.png','README.md','LICENSE','THIRD_PARTY_NOTICES.md
           'assets/slashblade/combostate/motion.vmd',
           'assets/slashblade/combostate/piercing.vmd','assets/slashblade/combostate/piercing_pl.vmd',
           'assets/slashblade/model/pa/player_motion.vmd','assets/slashblade/model/pa/alex.pmd',
-          'assets/slashblade/model/util/slash.obj','assets/slashblade/model/util/slash.png',
-          'assets/slashblade/model/util/drive.obj','assets/slashblade/model/util/ss.png'}
+          'assets/slashblade/model/util/slash.obj','assets/slashblade/model/util/slash.png'}
 
 
 def _png_size(data, label):
@@ -65,8 +64,6 @@ def validate(path):
     icon=files['pack.png']
     if not icon.startswith(b'\x89PNG\r\n\x1a\n'):raise ValueError('Invalid icon')
 
-    # slash.obj/png intentionally suppress Resharped's modern EntitySlashEffect
-    # visual while leaving its Java entity/gameplay behavior untouched.
     _rgba8_pixels(files['assets/slashblade/model/util/slash.png'],'slash.png')
     slash_vertices,slash_faces=_validate_obj(files['assets/slashblade/model/util/slash.obj'],'slash.obj',1,4)
     if (slash_vertices,slash_faces)!=(4,1):raise ValueError('Unexpected slash suppression mesh')
@@ -76,9 +73,10 @@ def validate(path):
         if line.startswith('v '):coords.extend(float(v) for v in line.split()[1:4])
     if max(abs(v) for v in coords)>=0.00001:raise ValueError('Slash suppression mesh is visible-sized')
 
-    if _png_size(files['assets/slashblade/model/util/ss.png'],'ss.png')!=(16,16):
-        raise ValueError('Unexpected classic Drive texture size')
-    _validate_obj(files['assets/slashblade/model/util/drive.obj'],'drive.obj',12)
+    # SA projectile art must remain supplied by Resharped/addons, not by this pack.
+    for forbidden in ('assets/slashblade/model/util/drive.obj','assets/slashblade/model/util/ss.png',
+                      'assets/slashblade/model/util/slashdim.obj','assets/slashblade/model/util/slashdim.png'):
+        if forbidden in files:raise ValueError(f'Unexpected SA art override: {forbidden}')
 
     motions={p:decode(b) for p,b in files.items() if p.endswith('.vmd')}
     for kind in ('player','blade'):
@@ -113,6 +111,6 @@ def validate(path):
 if __name__=='__main__':
     ap=argparse.ArgumentParser();ap.add_argument('path',nargs='?',type=Path,default=ROOT/'pack')
     result=validate(ap.parse_args().path)
-    print('PASS: structure, slash-light suppression, classic Drive adapter, PMD adapter, overridden frame slots and VMD records')
+    print('PASS: structure, slash-light suppression, SA-art preservation, PMD adapter, overridden frame slots and VMD records')
     for p,m in result.items():print(f'{p}: {m["key_count"]} keys, {len(m["bones"])} bones')
     print('Runtime verification pending')

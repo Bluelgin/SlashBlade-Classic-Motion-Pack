@@ -14,7 +14,7 @@
 - B/C/Circle/Void/Sakura and modern powered A4/A5 are approximations. Broad slot coverage is not equivalent to faithful restoration.
 - Void Slash is a modern Classic Interpretation, not an r32 move-for-move port. Its SlashDim visual is delayed to Resharped's real tick-16 Java release (VMD frame 2224), then resets at frame 2236; the later dedicated sheath state uses Noutou. The long-lived modern Void effect continues under Java control after the weapon gesture ends.
 - Piercing no longer falls back to upstream animation assets: the pack now generates both dedicated Piercing VMDs. Its blade path is a modern `CLASSIC_INTERPRETATION` using the r32 Stinger full-thrust pose and source-timed delayed Noutou recovery, while its player VMD is a passthrough adapter. Forward lunge, area hit, just timing, sound timing and cancellation remain modern Java and are not restored to r32 behavior.
-- Normal slash-light geometry/texture is classicized globally through Resharped's fixed `slash.obj/png` resource contract, and Drive gets a baked r32 procedural prism. This does **not** restore r32's blade-attached `LayerSlashBlade` trail renderer: Java still controls effect spawn timing, lifetime, progress rotation, scale/flattening, rank passes and colors. Those differences are `IMPOSSIBLE_RESOURCE_PACK_ONLY` in phase one.
+- Normal `EntitySlashEffect` blade light is globally suppressed through Resharped's fixed `slash.obj/png` contract. This also hides any SA/addon visual that reuses the same renderer; a resource pack cannot distinguish the caller. `drive.obj/ss.png` are deliberately left untouched after runtime testing showed that overriding them rewrites 幻影刃 / 幻影刃-纵 / 波刀龙胆 projectile art. Java still controls effect timing, rotation, color and gameplay.
 - Judgement Cut's installed Resharped `slashdim.obj/png` files are already identical to the r32 resource blobs, so the pack leaves them untouched. Its modern Java echo/wave/wind choreography remains authoritative.
 - Other Java-only render-target visibility switches, dynamic blur-copy count and GL-state choreography are not recreated.
 - Restart after enabling/disabling the pack is needed because the PMD is statically cached. Simple live enable/disable is not proven sufficient.
@@ -37,7 +37,7 @@ Hardcoded frame windows are respected by adapting data. Shared windows cannot re
 
 ## Provenance limitations
 
-The genuine official r32 release and corresponding versioned branch are identified. The JAR download was unavailable, so direct JAR/source equivalence is pending. Legacy custom terms are retained; no upstream binary art is redistributed or relicensed MIT. The classic trail adapter is newly generated project art; procedural Drive coordinates retain their documented legacy-source provenance.
+The genuine official r32 release and corresponding versioned branch are identified. The JAR download was unavailable, so direct JAR/source equivalence is pending. Legacy custom terms are retained; no upstream binary art is redistributed or relicensed MIT. The slash-suppression assets are newly generated project art. No Drive or Judgement Cut projectile/model art is shipped by this pack.
 
 ## Promotion gates
 
@@ -47,8 +47,8 @@ The genuine official r32 release and corresponding versioned branch are identifi
 - Verify source-timed Noutou recovery: six-tick motion to the final pose, then a short final-pose hold before neutral where the modern atlas window is long enough.
 - Verify Piercing's frame-33 Stinger commit, modern forward lunge alignment, frame-63 Noutou recovery, frame-72 final Noutou pose and frame-78 neutral return. Confirm the passthrough player body does not make the lunge unreadable.
 - Verify Void Slash remains in preparation through frame 2223, begins SlashDim at the modern tick-16/frame-2224 release, resets at 2236, then plays the separate Noutou sheath stage at 2278–2293.
-- Verify classic trail alignment across A/B/C/air/rapid/rising/Sakura/Void flows and confirm the fixed modern `-135° * progress` rotation does not create unacceptable post-swing drift.
-- Verify the baked classic Drive prism orientation for both horizontal and vertical/wave usages.
+- Verify that global slash-light suppression is acceptable for Circle Slash, Sakura End, Void Slash and any addon using `EntitySlashEffect`; selective per-caller restoration is not resource-pack-only.
+- Verify that 幻影刃, 幻影刃-纵, 波刀龙胆 and third-party `EntityDrive` visuals remain identical to the installed Resharped/addon baseline.
 - Compare attack/sheath audio separately and record modern Java-selected SoundEvent/pitch/timing differences rather than misclassifying them as animation regressions.
 - Tune source-derived timing and recovery within fixed slots.
 - Decide whether the vanilla-pose, fixed first-person-wrapper, modern-audio and resource-only effect approximations meet the requested visual goal; they must not be presented as recovered skeletal animation, restored r32 FPV Java, restored r32 sound orchestration, or the old Java trail renderer.
