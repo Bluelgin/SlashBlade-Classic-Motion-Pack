@@ -21,10 +21,10 @@ Record exact Resharped JAR version/hash, Forge version, dependency versions, pac
 | Rapid Slash / quick | NOT RUN | |
 | Rising Star | NOT RUN | |
 | Judgement Cut / air / just / end | NOT RUN | installed `slashdim` art is already r32-identical; judge Java choreography separately |
-| Void Slash | NOT RUN | SlashDim now begins at modern tick 16 / VMD frame 2224; global classic trail adapter applies to its long-lived `EntitySlashEffect` too |
+| Void Slash | NOT RUN | SlashDim begins at modern tick 16 / VMD frame 2224; its long-lived `EntitySlashEffect` is also hidden by the global no-slash-light resource policy |
 | Sakura End ground/air/finish | NOT RUN | |
-| Drive horizontal/vertical | NOT RUN | verify restored prism orientation and scale |
-| Wave Edge | NOT RUN | verify restored prism orientation and scale |
+| Drive horizontal/vertical | NOT RUN | verify installed Resharped Phantom Blade projectile art is unchanged by this pack |
+| Wave Edge | NOT RUN | verify installed Resharped projectile art is unchanged by this pack |
 | Guard recovery | NOT RUN | |
 | Idle / draw / sheath | NOT RUN | |
 | Piercing / Piercing Just | NOT RUN | generated Stinger interpretation + delayed Noutou hold + passthrough player VMD; verify modern lunge alignment |
@@ -88,23 +88,19 @@ Piercing is a dedicated resource-only Classic Interpretation rather than an upst
 - [ ] The generated `piercing_pl.vmd` passthrough leaves the body readable during the Java lunge; no modern full-body Piercing pose should reappear from another pack with higher priority.
 - [ ] Do not attribute forward distance, area hit, just-window timing or cancel behavior to this pack. Those remain Resharped Java.
 
-## Classic trail / effect pass
+## Slash-light / SA effect pass
 
-For every attack that emits the normal `EntitySlashEffect` (ground A/B/C chains, air chains, Rapid/Rising/Sakura and other `AttackManager.doSlash` callers):
+For every attack or SA that emits `EntitySlashEffect` (ground/air combo slash effects, Circle Slash, Sakura End, Void Slash and addon consumers):
 
-- [ ] The modern broad radial disc is replaced by a narrow, tapered classic-looking afterimage.
-- [ ] The trail is on the same visual side of the weapon swing and does not appear mirrored.
-- [ ] At the actual hit/swing moment the brightest core is close enough to the classic blade path to read as one motion.
-- [ ] On fast multi-hit moves, repeated trail entities do not form an opaque modern-looking wheel.
-- [ ] On slow/long-lived Void Slash, record whether Resharped's fixed `rotationOffset - 135° * progress` causes the ribbon to rotate after the classic weapon motion has ended. If so, mark the residual as `IMPOSSIBLE_RESOURCE_PACK_ONLY`, not as an OBJ bug.
-- [ ] Low and high Concentration Rank: Java's black/color/white layered passes still remain readable with the neutral classic alpha mask.
-- [ ] Different blade colors tint the trail cleanly; no color is baked into the replacement texture.
+- [ ] No visible `slash.obj/png` blade light is rendered.
+- [ ] Gameplay, damage, sound and entity lifetime still behave normally even though the mesh is invisible.
+- [ ] Record any SA that depended on the shared `EntitySlashEffect` art; a resource pack cannot selectively restore it while hiding ordinary slash lights.
 
 For Drive/Wave effects:
 
-- [ ] Horizontal Drive has the old compact prism/bolt silhouette, not an oversized plane.
-- [ ] Vertical Drive and Wave Edge are not rotated 90° off-axis by the old→modern pre-transform.
-- [ ] Alpha/color remain controlled by Resharped and fade without texture seams.
+- [ ] 幻影刃 and 幻影刃-纵 use the installed Resharped `drive.obj/ss.png` appearance with no pack-induced deformation.
+- [ ] 波刀龙胆 likewise keeps the installed projectile art.
+- [ ] Third-party `EntityDrive` users are not changed by this pack.
 
 For Judgement Cut:
 
