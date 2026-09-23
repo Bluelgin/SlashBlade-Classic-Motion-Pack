@@ -6,73 +6,60 @@ This document defines the resource-pack-only visual policy for attack effects on
 
 The classic blade/saya bake changes the weapon path substantially. Resharped's modern `EntitySlashEffect` is a separately animated effect entity: Java owns its lifetime, progress rotation, flattening, scale, rank passes and color. r32's classic trail was instead attached to the blade renderer and followed the actual blade motion.
 
-A first resource-only attempt replaced Resharped's radial slash mesh with a narrow classic-style ribbon. Runtime testing showed that the result still looked wrong because the modern effect entity continued its own Java rotation independently of the restored blade motion. That mismatch cannot be solved faithfully with an OBJ/PNG replacement alone.
+A first resource-only attempt replaced Resharped's radial slash mesh with a narrow classic-style ribbon. Runtime testing showed that the result still looked wrong because the modern effect entity continued its own Java rotation independently of the restored blade motion. The default pack therefore suppresses this shared slash-light visual instead of shipping a fake classic trail.
 
-The default pack therefore makes the deliberate choice to show **no normal slash light at all**. This is preferable to shipping a fake classic trail that visibly disagrees with the restored animation.
+## Shared-resource warning
+
+The `SlashEffectRenderer` has only one hard-coded `slash.obj/png` pair. That resource is not limited to ordinary attacks. Base Resharped also creates `EntitySlashEffect` from Slash Arts such as Circle Slash, Sakura End and Void Slash, and third-party addons may reuse the same entity. A pure resource pack cannot tell which caller created a given instance.
+
+Therefore slash-light suppression is intentionally **global to EntitySlashEffect**. It cannot mean “hide only ordinary attack lights but preserve every SA that happens to use the same renderer.”
+
+A separate collision was found during runtime testing: `DriveRenderer` uses one hard-coded `drive.obj` + `ss.png` pair for `EntityDrive`. Those resources are the visible projectile art for 幻影刃 (`drive_horizontal`), 幻影刃-纵 (`drive_vertical`), 波刀龙胆 (`wave_edge`) and any addon that reuses `EntityDrive`. The earlier classic-Drive experiment therefore rewrote SA sword-qi art. That override has been removed.
 
 ## Effect families
 
 | Runtime family | Resharped resource contract | Pack policy | Coverage |
 |---|---|---|---|
-| `EntitySlashEffect` / `SlashEffectRenderer` | `slashblade:model/util/slash.obj`, `slash.png` | **Visual suppression**: microscopic valid mesh + fully transparent texture | All `AttackManager.doSlash(...)` visuals; Void Slash also creates an `EntitySlashEffect` and its slash-light visual is suppressed by the same override |
-| `EntityDrive` / `DriveRenderer` | `slashblade:model/util/drive.obj`, `ss.png` | **Classic Restoration (visual)**: bake the r32 procedural Drive prism into the modern renderer's fixed OBJ coordinate system | Drive-family projectile/wave effect |
-| `EntityJudgementCut` / `JudgementCutRenderer` | `slashblade:model/util/slashdim.obj`, `slashdim.png` | **Already classic upstream**: do not duplicate the art in this pack | Judgement Cut dimension effect |
+| `EntitySlashEffect` / `SlashEffectRenderer` | `slashblade:model/util/slash.obj`, `slash.png` | **Visual suppression**: microscopic valid mesh + fully transparent texture | Ordinary `AttackManager.doSlash(...)` plus any SA/addon that uses `EntitySlashEffect`, including Circle Slash, Sakura End and Void Slash |
+| `EntityDrive` / `DriveRenderer` | `slashblade:model/util/drive.obj`, `ss.png` | **Preserve installed SA art**: do not override | 幻影刃, 幻影刃-纵, 波刀龙胆 and third-party `EntityDrive` users |
+| `EntityJudgementCut` / `JudgementCutRenderer` | `slashblade:model/util/slashdim.obj`, `slashdim.png` | **Already classic upstream**: do not duplicate | Judgement Cut dimension effect |
 
-The machine-readable version of this table is `data/effect_resource_contract.json`.
+The machine-readable version is `data/effect_resource_contract.json`.
 
 ## Normal slash-light suppression
 
-Simply deleting `slash.obj/png` from this pack would cause Minecraft to fall back to Resharped's original modern slash light, so the files must remain as overrides.
+Simply deleting `slash.obj/png` from this pack would make Minecraft fall back to Resharped's original modern slash light, so the files remain as overrides. `scripts/generate_effects.py` emits a tiny non-degenerate four-vertex `base` quad and a fully transparent 1x1 RGBA texture.
 
-`scripts/generate_effects.py` therefore generates:
+This changes only the rendered `EntitySlashEffect` mesh/texture. The entity still exists and Resharped remains authoritative for gameplay, timing, networking, sounds and any non-model behavior.
 
-- a tiny, non-degenerate four-vertex `base` quad for `slash.obj`; and
-- a fully transparent 1x1 RGBA texture for `slash.png`.
+## Drive / Phantom Blade policy
 
-The mesh is kept valid and non-degenerate to avoid OBJ parser/normal edge cases. Its microscopic size is a second safety layer in addition to the transparent texture.
+The pack does **not** ship `drive.obj` or `ss.png`.
 
-This changes only the **rendered slash-light visual**. The `EntitySlashEffect` entity still exists and Resharped remains authoritative for gameplay, timing, networking, sounds and any non-model behavior attached to it.
-
-## Drive
-
-r32 `RenderDrive.java` did not use an OBJ: it declared a 14-point prism and 12 quads directly in Java, then compressed local X by 0.25. Resharped's `DriveRenderer` instead expects `model/util/drive.obj`, applies a uniform 0.015 scale and a +90 degree Y rotation.
-
-`scripts/generate_effects.py` takes the documented r32 procedural points and pre-transforms them so the fixed Resharped transform reconstructs the classic prism silhouette. `ss.png` is generated as a neutral luminous mask so the modern entity color remains authoritative.
-
-This restores the classic *geometry language*, not the old renderer's exact OpenGL state or alpha function.
+Although r32 had a procedural Drive prism that can be reconstructed mathematically, replacing the modern fixed resources globally also replaces the user-visible projectile art of Phantom Blade-class Slash Arts. Runtime testing showed that this was a compatibility regression, so preservation of SA art takes priority over forcing a classic projectile silhouette.
 
 ## Judgement Cut
 
-No visual replacement is needed for the model/texture contract. The Resharped resource inventory and r32 resource inventory have identical Git blob IDs for both files:
+No visual replacement is needed for the model/texture contract. Resharped and r32 have identical Git blob IDs for both files:
 
 - `slashdim.obj`: `9ab8de31a33970b884df9f4683ece271e9f12889`
 - `slashdim.png`: `b79daa73dd545d0a8c3c41c845b083055bd7481a`
 
-Resharped's Java rendering choreography is not identical to r32, but shipping another copy of the same art would not make it more classic and would unnecessarily redistribute upstream art. The installed Resharped copy is therefore left untouched.
+The installed Resharped copy is left untouched.
 
 ## Resource-pack ceiling
 
-The following remain Java-owned and cannot be changed by this phase:
+A resource pack cannot select effect resources by Java caller. All `EntitySlashEffect` instances share one `slash.obj/png`, and all `EntityDrive` instances share one `drive.obj/ss.png`. Spawn timing, lifetime, rotation, rank passes, color, hitboxes, damage, particles, sounds and networking remain Java-owned.
 
-- when an effect entity is spawned;
-- effect lifetime and despawn timing;
-- `SlashEffectRenderer` progress rotation, flattening, scale curve and rank passes;
-- effect color and critical/rank state;
-- Drive entity timing/rotation/alpha curve;
-- Judgement Cut seed rotation, echo/wave/wind choreography;
-- hitboxes, damage, hit timing, particles, sounds and networking.
-
-Because the old blade-attached trail renderer cannot be reconstructed inside Resharped's fixed `EntitySlashEffect` contract, **suppression is the final default policy for normal slash light in the resource-pack-only build**.
+This is why the current default makes two different choices: suppress the shared slash-light renderer because the user prefers no mismatched blade light, but preserve Drive/Judgement SA art rather than globally rewriting their projectile visuals.
 
 ## Build/validation
 
-`python scripts/build_pack.py` generates the effect resources together with the VMD/PMD output. CI verifies:
+CI verifies that:
 
-- the hard-coded `slash.obj/png` paths are present so Resharped cannot fall back to its modern slash light;
-- `slash.png` is a fully transparent 1x1 RGBA texture;
-- `slash.obj` is a microscopic valid `base` quad rather than a visible effect mesh;
-- the Drive mesh reconstructs the documented r32 prism under the modern fixed transform;
-- Judgement Cut remains deliberately unbundled because its installed Resharped model/texture are already byte-identical to r32;
+- `slash.obj/png` are present, microscopic/transparent and cannot fall back to the modern slash disc;
+- `drive.obj`, `ss.png`, `slashdim.obj` and `slashdim.png` are **absent from the pack**, preventing accidental SA-art overrides;
+- VMD/PMD animation assets remain unchanged by this policy;
 - no Java/Mixin/script/datapack runtime component is introduced.
 
-Runtime visual acceptance is still a real-game check rather than something CI can certify.
+Runtime visual acceptance remains an in-game check.
