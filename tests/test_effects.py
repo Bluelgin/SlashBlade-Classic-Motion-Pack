@@ -8,8 +8,8 @@ import zlib
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
 from scripts.generate_effects import (
-    classic_drive_obj, classic_drive_png, suppressed_slash_obj, suppressed_slash_png,
-    generate, SLASH_OBJ, SLASH_PNG, DRIVE_OBJ, DRIVE_PNG,
+    suppressed_slash_obj, suppressed_slash_png,
+    generate, SLASH_OBJ, SLASH_PNG,
 )
 
 
@@ -57,39 +57,29 @@ class ClassicEffectTests(unittest.TestCase):
         self.assertEqual((w,h),(1,1))
         self.assertEqual(p[0][0],(0,0,0,0))
 
-    def test_drive_bakes_r32_prism_into_modern_fixed_transform(self):
-        vertices,groups,faces=parse_obj(classic_drive_obj())
-        self.assertEqual(groups,['base'])
-        self.assertEqual(len(vertices),14)
-        self.assertEqual(len(faces),12)
-        self.assertAlmostEqual(vertices[0][0],33.333333,5)
-        self.assertAlmostEqual(vertices[0][1],66.666667,5)
-        self.assertAlmostEqual(vertices[0][2],0.0,5)
-        self.assertAlmostEqual(vertices[13][0],33.333333,5)
-        self.assertAlmostEqual(vertices[13][1],-66.666667,5)
-        self.assertEqual(decode_rgba_png(classic_drive_png())[:2],(16,16))
-
-    def test_effect_contract_covers_all_fixed_renderer_families(self):
+    def test_effect_contract_preserves_sa_projectile_art(self):
         data=json.loads((ROOT/'data/effect_resource_contract.json').read_text())
         rows={row['id']:row for row in data['contracts']}
         self.assertEqual(set(rows),{'entity_slash_effect','entity_drive','entity_judgement_cut'})
-        self.assertEqual(rows['entity_slash_effect']['model'],'slashblade:model/util/slash.obj')
-        self.assertIn('Void Slash',rows['entity_slash_effect']['coverage'])
         self.assertEqual(rows['entity_slash_effect']['pack_action'],'SUPPRESS_SLASH_LIGHT_VISUAL')
-        self.assertEqual(rows['entity_drive']['pack_action'],'BAKE_R32_PROCEDURAL_DRIVE_PRISM')
+        self.assertEqual(rows['entity_drive']['pack_action'],'LEAVE_INSTALLED_RESHARPED_ASSET_UNTOUCHED')
+        self.assertIn('幻影刃',rows['entity_drive']['coverage'])
         jc=rows['entity_judgement_cut']
         self.assertEqual(jc['modern_model_git_blob'],jc['legacy_model_git_blob'])
         self.assertEqual(jc['modern_texture_git_blob'],jc['legacy_texture_git_blob'])
         self.assertEqual(jc['pack_action'],'LEAVE_INSTALLED_RESHARPED_ASSET_UNTOUCHED')
 
-    def test_generator_writes_only_the_effect_overrides_we_intend(self):
+    def test_generator_does_not_override_drive_or_judgement_cut_art(self):
         import tempfile
         with tempfile.TemporaryDirectory() as td:
-            output=generate(Path(td))
-            self.assertEqual(set(output),{SLASH_OBJ,SLASH_PNG,DRIVE_OBJ,DRIVE_PNG})
+            root=Path(td)
+            output=generate(root)
+            self.assertEqual(set(output),{SLASH_OBJ,SLASH_PNG})
             for rel,payload in output.items():
-                self.assertEqual((Path(td)/rel).read_bytes(),payload)
-            self.assertFalse((Path(td)/'assets/slashblade/model/util/slashdim.obj').exists())
+                self.assertEqual((root/rel).read_bytes(),payload)
+            self.assertFalse((root/'assets/slashblade/model/util/drive.obj').exists())
+            self.assertFalse((root/'assets/slashblade/model/util/ss.png').exists())
+            self.assertFalse((root/'assets/slashblade/model/util/slashdim.obj').exists())
 
 
 if __name__=='__main__':unittest.main()
