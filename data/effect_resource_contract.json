@@ -16,10 +16,10 @@
       "renderer": "client/renderer/entity/SlashEffectRenderer.java",
       "model": "slashblade:model/util/slash.obj",
       "texture": "slashblade:model/util/slash.png",
-      "coverage": "global AttackManager.doSlash and Void Slash EntitySlashEffect visuals",
-      "policy": "VISUAL_SUPPRESSION",
+      "coverage": "global EntitySlashEffect visuals: normal AttackManager.doSlash plus SA consumers such as Circle Slash, Sakura End and Void Slash; third-party addons may reuse it too",
+      "policy": "VISUAL_SUPPRESSION_WITH_SHARED_RENDERER_SIDE_EFFECTS",
       "pack_action": "SUPPRESS_SLASH_LIGHT_VISUAL",
-      "reason": "The r32 blade-attached trail renderer cannot be reproduced faithfully through Resharped's rotating EntitySlashEffect resource contract; user testing found the simulated ribbon visually distracting.",
+      "reason": "The r32 blade-attached trail cannot be reproduced faithfully through Resharped's rotating EntitySlashEffect contract. Suppression is global because the renderer has no per-caller resource selector.",
       "implementation": "microscopic non-degenerate base quad plus fully transparent 1x1 texture",
       "java_owned": ["spawn timing", "lifetime", "rotationOffset", "rotationRoll", "baseSize", "rank passes", "color", "progress rotation", "gameplay entity behavior"]
     },
@@ -28,9 +28,10 @@
       "renderer": "client/renderer/entity/DriveRenderer.java",
       "model": "slashblade:model/util/drive.obj",
       "texture": "slashblade:model/util/ss.png",
-      "coverage": "Drive-family projectile/wave visual",
-      "policy": "CLASSIC_RESTORATION_VISUAL",
-      "pack_action": "BAKE_R32_PROCEDURAL_DRIVE_PRISM",
+      "coverage": "幻影刃 (drive_horizontal), 幻影刃-纵 (drive_vertical), 波刀龙胆 (wave_edge), and any addon reusing EntityDrive",
+      "policy": "PRESERVE_SA_ART",
+      "pack_action": "LEAVE_INSTALLED_RESHARPED_ASSET_UNTOUCHED",
+      "reason": "Runtime testing showed that globally replacing drive.obj/ss.png changes the visible sword-qi art of Phantom Blade-class Slash Arts. Motion restoration must not rewrite SA projectile art.",
       "java_owned": ["spawn timing", "lifetime", "entity rotation", "color", "alpha curve"]
     },
     {
