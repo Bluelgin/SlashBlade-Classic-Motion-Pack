@@ -2,7 +2,7 @@
 
 Restore the classic SlashBlade 1.12.2 motion style on SlashBlade: Resharped for Minecraft 1.20.1.
 
-**v0.1.0 experimental candidate — Runtime verification pending.** This is a resource pack, not a mod. It contains a source-derived classic blade/saya animation bake, a vanilla player-pose adapter, dedicated Piercing classicization, slash-light suppression, and generated classic Drive visuals. It does **not** contain recovered 1.12.2 skeletal animations: that version implements its blade motions procedurally in Java and has no VMD files.
+**v0.1.0 experimental candidate — Runtime verification pending.** This is a resource pack, not a mod. It contains a source-derived classic blade/saya animation bake, a vanilla player-pose adapter, dedicated Piercing classicization, slash-light suppression, and SA-art preservation. It does **not** contain recovered 1.12.2 skeletal animations: that version implements its blade motions procedurally in Java and has no VMD files.
 
 ## Requirements
 
@@ -32,7 +32,7 @@ The restart is necessary for a reliable test: Resharped caches the player PMD in
 | Piercing | Dedicated modern **Classic Interpretation**: Resharped's isolated `piercing.vmd` is replaced by r32 Stinger thrust language with source-timed delayed Noutou recovery; `piercing_pl.vmd` is replaced by the vanilla-body passthrough adapter |
 | B, Circle, C, Sakura, shared Drive/Wave slots | Shared-slot **Classic Interpretation** compromises; one VMD region must serve every modern consumer |
 | Normal slash light / `EntitySlashEffect` | **Suppressed by design.** The default pack overrides `slash.obj/png` with a microscopic valid mesh and fully transparent texture, so neither Resharped's modern slash disc nor the earlier simulated classic ribbon is shown. The effect entity and gameplay logic still run normally |
-| Drive projectile visual | r32's procedural 14-point Drive prism is baked into Resharped's fixed `drive.obj` transform; generated neutral `ss.png` keeps modern blade color tinting |
+| Phantom Blade / Drive / Wave projectile visual | **Preserved from installed Resharped/addons.** The pack does not override `drive.obj` or `ss.png`; these are shared SA projectile-art resources used by 幻影刃, 幻影刃-纵, 波刀龙胆 and potentially third-party `EntityDrive` users |
 | Judgement Cut visual | Resharped already ships the exact r32 `slashdim.obj/png` Git blobs; the pack deliberately leaves them untouched instead of redistributing duplicate art |
 | Player body | Modern custom full-body poses bypassed by a generated PMD adapter; underlying **1.20.1 vanilla poses** retained, not an exact 1.12.2 body restoration |
 | First-person attack motion | The same classic VMD blade/saya motion is visible through Resharped's blade layer; runtime clipping/alignment still needs in-game acceptance |
@@ -54,7 +54,7 @@ The old r32 view is not just an item-model transform. `BladeFirstPersonRender` a
 
 ### Resource-pack effect ceiling
 
-The pack can replace Resharped's hard-coded effect meshes/textures, but it cannot replace the Java entity renderer. r32's classic trail was attached to the blade renderer, while Resharped's `EntitySlashEffect` owns a separate progress rotation, lifetime, scale/flattening, color and rank passes. The earlier simulated classic ribbon therefore remained visibly out of sync with the restored weapon motion in runtime testing. The default pack now suppresses that normal slash-light visual entirely rather than pretending to restore a renderer that a resource pack cannot reproduce. Drive and Judgement Cut keep their documented resource-level treatment.
+The pack can replace Resharped's hard-coded effect meshes/textures, but it cannot replace the Java entity renderer. r32's classic trail was attached to the blade renderer, while Resharped's `EntitySlashEffect` owns a separate progress rotation, lifetime, scale/flattening, color and rank passes. The earlier simulated classic ribbon therefore remained visibly out of sync with the restored weapon motion in runtime testing. The default pack now suppresses that shared slash-light visual entirely rather than pretending to restore a renderer that a resource pack cannot reproduce. Because `slash.obj/png` are also shared by SA consumers such as Circle Slash, Sakura End and Void Slash, this suppression cannot be limited to ordinary attacks in a resource pack. By contrast, `drive.obj/ss.png` are no longer overridden at all: runtime testing showed that doing so rewrote Phantom Blade-class SA sword-qi art.
 
 ### Resource-pack audio ceiling
 
@@ -81,4 +81,4 @@ The build regenerates all shipped VMD/PMD and effect resources, writes an origin
 
 ## Credits and license
 
-Classic procedural motion/effect reference: Furia / flammpfeil, SlashBlade `mc1.12-r32`, official `1.12.2` branch. Modern resource contracts: MMF-Group / 0999312, SlashBlade: Resharped. Independent validation reference: Old Dream Reforged, pinned and credited in `THIRD_PARTY_NOTICES.md`. The codec, packaging, generated slash-suppression assets, generated neutral Drive texture and original metadata use this repository's MIT license. The legacy-derived motion and procedural Drive geometry retain their separately documented provenance and custom upstream terms; they are **not** relabeled MIT. No modern upstream VMD, PMD, texture or model binary is redistributed. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+Classic procedural motion/effect reference: Furia / flammpfeil, SlashBlade `mc1.12-r32`, official `1.12.2` branch. Modern resource contracts: MMF-Group / 0999312, SlashBlade: Resharped. Independent validation reference: Old Dream Reforged, pinned and credited in `THIRD_PARTY_NOTICES.md`. The codec, packaging, generated slash-suppression assets and original metadata use this repository's MIT license. The legacy-derived motion data retains its separately documented provenance and custom upstream terms; it is **not** relabeled MIT. No modern upstream VMD, PMD, texture or model binary is redistributed. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
